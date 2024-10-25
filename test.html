@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alpine.js Toggle Example</title>
+  <!-- Include Alpine.js CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body>
+  <!-- Alpine.js component -->
+  <div x-data="{ toggled: false }" @toggle.window="toggled = !toggled">
+    <!-- Display based on the toggled state -->
+    <p x-show="toggled">Toggled: true</p>
+    <p x-show="!toggled">Toggled: false</p>
+  </div>
+
+  <!-- Button to dispatch the event outside the Alpine component -->
+  <button onclick="window.dispatchEvent(new CustomEvent('toggle'))">
+    Toggle from Outside
+  </button>
+</body>
+</html>

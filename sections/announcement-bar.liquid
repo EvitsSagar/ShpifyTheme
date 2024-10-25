@@ -1,0 +1,107 @@
+{{ 'component-slideshow.css' | asset_url | stylesheet_tag }}
+{{ 'component-slider.css' | asset_url | stylesheet_tag }}
+
+{% comment %} {{ section.settings.imageP | image_url: '50px' | img_tag }} {% endcomment %}
+{% comment %} <img src="{{ section.settings.imageP | image_url: '50px' | img_tag }}" alt="" id="imageP"> {% endcomment %}
+{% comment %}
+  <img
+    src="{{ section.settings.imageP | image_url: width: 480, height: 480 }}"
+    alt="{{ section.settings.image.alt | escape }}"
+    width="50"
+    height="50"
+  >
+{% endcomment %}
+
+{% comment %}
+  {% if social_icons %}
+    {{ 'component-list-social.css' | asset_url | stylesheet_tag }}
+  {% endif %}
+{% endcomment %}
+
+{% for block in section.blocks %}
+  <div
+    class="{{section.settings.text_align}} py-5"
+    style="background-color:{{block.settings.bg_color}}; color:{{block.settings.text_color}};"
+  >
+    {{ block.settings.text }}
+  </div>
+{% endfor %}
+
+{% schema %}
+{
+  "name": "t:sections.announcement-bar.name",
+  "max_blocks": 13,
+  "settings": [
+    {
+      "type": "radio",
+      "id": "text_align",
+      "label": "Text Align",
+      "options": [
+        {
+          "value": "text-left",
+          "label": "Left"
+        },
+        {
+          "value": "text-center",
+          "label": "Center"
+        },
+        {
+          "value": "text-right",
+          "label": "Right"
+        }
+      ],
+      "default": "text-center"
+    }
+    // {
+    //   "type": "range",
+    //   "id": "padding",
+    //   "min": 0,
+    //   "max": 100,
+    //   "step": 1,
+    //   "unit": "px",
+    //   "label": "padding vertical",
+    //   "default": 21
+    // }
+  ],
+  "class": "announcement-bar-section",
+  "enabled_on": {
+    "groups": ["header"]
+  },
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "t:sections.announcement-bar.blocks.announcement.name",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p></p>"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text Color",
+          "default": "#000"
+        },
+        {
+          "type": "color",
+          "id": "bg_color",
+          "label": "Background Color",
+          "default": "#fff"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.announcement-bar.presets.name",
+      "blocks": [
+        {
+          "type": "announcement"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300&family=Ubuntu:wght@400&display=swap");
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+  user-select: none;
+  scroll-behavior: smooth;
+}
+::-webkit-scrollbar {
+  width: 5px;
+  height: 0;
+  background-color: #333;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #666;
+  border-radius: 5px;
+}
+body {
+  position: relative;
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.wraper {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  background-color: #ffffff18;
+  top: 0;
+  width: 100%;
+  height: 4.5rem;
+  z-index: 999;
+  backdrop-filter: blur(10px);
+  margin-right: 0.3rem;
+  padding: 0 20px;
+  transition: 0.3s ease;
+}
+header.active1 {
+  background-color: #a1a1a196;
+  height: 3rem;
+}
+header .logo {
+  color: #fff;
+  font-family: "Ubuntu";
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: 0.4rem;
+  text-decoration: none;
+  margin-left: 1rem;
+  z-index: 99999;
+}
+header .menu {
+  width: fit-content;
+  height: 100%;
+  display: flex;
+  transition: 0s;
+}
+header .menu-shadow {
+  display: none;
+}
+header .menu .close-menu {
+  display: none;
+}
+.menu a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 0.2rem;
+  padding: 0rem 0.5rem;
+  height: 100%;
+  color: #fff;
+  font-weight: 500;
+  letter-spacing: 0.1rem;
+  font-size: 1rem;
+  text-decoration: none;
+  border-radius: 1px;
+}
+header .menu a:hover,
+header .menu a.active {
+  font-weight: 600;
+  color: crimson;
+  transition: color 0.1s ease-in;
+}
+header.active1 .menu a:hover,
+header.active1 .menu a.active {
+  background-color: crimson;
+  color: #fff;
+}
+
+header .show-bar {
+  display: none;
+  position: absolute;
+  right: 2rem;
+  font-size: 1.3rem;
+  padding: 0.5rem 0.7rem;
+  transition: 0.3s ease;
+  cursor: pointer;
+  border-radius: 5px;
+}
+header .show-bar:hover {
+  background-color: #dddddd63;
+}
+.section {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #000;
+  scroll-snap-align: start;
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
+}
+.section:nth-child(1) {
+  background-image: url(https://i.postimg.cc/wxfW0cwm/bg1.png);
+}
+.section:nth-child(2) {
+  background-image: url(https://i.postimg.cc/yYDL5gGr/bg2.jpg);
+}
+.section:nth-child(3) {
+  background-image: url(https://i.postimg.cc/L8fN4d2t/bg3.jpg);
+}
+.section:nth-child(4) {
+  background-image: url(https://i.postimg.cc/KY2QR98d/bg4.jpg);
+}
+.section:nth-child(5) {
+  background-image: url(https://i.postimg.cc/g0HsRvwr/bg5.jpg);
+}
+
+.section .section-span {
+  font-size: 4.5rem;
+  font-weight: 650;
+  color: #000;
+  opacity: 0;
+  transform: scale(0);
+  text-transform: uppercase;
+}
+.section:nth-child(even) .section-span {
+  transform: translateX(100vw);
+}
+.section:nth-child(odd) .section-span {
+  transform: translateX(-100vw);
+}
+.section.active-sec .section-span {
+  transition: transform 1.5s ease;
+  transform: translateX(0) scale(1);
+  opacity: 1;
+}
+@media (max-width: 750px) {
+  body header .menu {
+    position: fixed;
+    top: 0;
+    left: -20rem;
+    width: 20rem;
+    height: 100vh;
+    flex-direction: column;
+    background-color: #222;
+    padding: 0;
+    padding-top: 3.5rem;
+    z-index: 99999;
+    overflow-y: auto;
+    transition: left 0.5s linear;
+  }
+  body header .menu-active {
+    left: 0;
+  }
+  header .menu-shadow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000000b7;
+    backdrop-filter: blur(50px);
+  }
+  header .shadow-active {
+    display: block;
+  }
+  header .menu a {
+    text-align: center;
+    color: #fff;
+    height: 4rem;
+    margin: 10px 0;
+    cursor: pointer;
+    border-radius: 0;
+    transition: 0s;
+  }
+  header .menu a.active {
+    font-weight: 600;
+    background: crimson;
+    color: #fff;
+  }
+  header .menu a:hover {
+    background-color: crimson;
+    color: #fff;
+    font-weight: 600;
+  }
+  header .show-bar {
+    display: block;
+  }
+  header .hide-bar {
+    display: none;
+  }
+  header .menu .close-menu {
+    display: block;
+    position: absolute;
+    top: 1.2rem;
+    right: 30px;
+    padding: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 0;
+    color: #fff;
+    cursor: pointer;
+  }
+}
+
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="section" id="home">
+          <span class="section-span">Home</span>
+          <header id="header">
+            <a href="#" class="logo">Website</a>
+            <div class="menu">
+              <a href="#home" class="active" onclick="closeMenu()">Home</a>
+              <a href="#aboutme" onclick="closeMenu()">About me</a>
+              <a href="#service" onclick="closeMenu()">Service</a>
+              <a href="#gallery" onclick="closeMenu()">Gallery</a>
+              <a href="#contactus" onclick="closeMenu()">Contact Us</a>
+              <i class="fa fa-times close-menu" onclick="closeMenu()"></i>
+            </div>
+            <div class="menu-shadow" onclick="closeMenu()"></div>
+            <i class="fa fa-bars show-bar" onclick="openMenu()"></i>
+          </header>
+        </div>
+        <div class="section" id="aboutme"><span class="section-span">About me</span></div>
+        <div class="section" id="service"><span class="section-span">Service</span></div>
+        <div class="section" id="gallery"><span class="section-span">Gallery</span></div>
+        <div class="section" id="contactus"><span class="section-span">Contact Us</span></div>
+      </div>
+     
+</body>
+</html>

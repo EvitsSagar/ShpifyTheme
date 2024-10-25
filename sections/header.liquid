@@ -1,0 +1,326 @@
+{%- style -%}
+{%- endstyle -%}
+
+<style>
+  .menu {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .menu a {
+    display: block;
+    padding: 7px 15px;
+    font-size: 17px;
+    font-weight: 500;
+    transition: 0.2s all ease-in-out;
+    color: #fff;
+  }
+
+  .menu:hover a {
+    opacity: 0.4;
+  }
+
+  .menu a:hover {
+    opacity: 1;
+    color: #fff;
+  }
+
+  .menu-icon {
+    display: none;
+  }
+
+  #menu-toggle {
+    display: none;
+  }
+
+  #menu-toggle:checked ~ .menu {
+    transform: scale(1, 1);
+  }
+</style>
+<header
+  class="header border-y items-center bg-[#151418] shadow-2xl z-10"
+  style="margin-bottom:{{section.settings.margin_bottom}};padding:{{section.settings.padding_top}}px {{section.settings.paddingx}}px {{section.settings.padding_bottom}}px {{section.settings.paddingx}}px;"
+>
+  <div class="header__logo md:flex:justify-center">
+    {% if section.settings.pick_logo != blank %}
+      <a href="/">
+        <img
+          src="{{ section.settings.pick_logo | image_url: width: 480, height: 480 }}px"
+          alt="{{ section.settings.image.alt | escape }}"
+          width="50"
+          height="50"
+        >
+      </a>
+    {% else %}
+      <div class="text-xl font-bold text-white sm:flex:justify-center">
+        <a href="/">{{ shop.name }}</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="header__menu flex">
+    <button
+      class="md:hidden text-white bg-gradient-to-r from-[#F4F6FF] via-[#F5F7F8] to-[#F4F6FF] hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-[#F4F6FF] dark:focus:ring-cyan-800 shadow-lg shadow-[#EEF7FF]/50 dark:shadow-lg dark:shadow-[#EEF7FF]/80 font-medium rounded-lg text-sm  text-center p-2"
+      onclick="window.dispatchEvent(new CustomEvent('sidemenu'))"
+      type="button"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#5f6368">
+        <g fill="none"><path d="M0 0h24v24H0V0z"/><path d="M0 0h24v24H0V0z" opacity=".87"/></g><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7zm-4 6h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+      </svg>
+    </button>
+    <nav class="hidden md:flex">
+      <ul class="menu">
+        {% for link in section.settings.menu.links %}
+          {% if link != blank %}
+            {% if link.links != blank %}
+              <li>
+                <a
+                  class="nav__item py-5 px-4 block hover:text-gray-300 transition-colors {% if link.current %} opacity-100 text-white {% else %} opacity-40 {% endif %}"
+                  href="{{ link.url }}"
+                >
+                  {{- link.title -}}
+                </a>
+              </li>
+              {% for childLink in link.links %}
+              {% endfor %}
+            {% else %}
+              <li>
+                <a
+                  class="nav__item py-5 px-4 block hover:text-gray-300 transition-colors {% if link.current %} opacity-100 text-white {% else %} opacity-40 {% endif %}"
+                  href="{{ link.url }}"
+                >
+                  {{- link.title -}}
+                </a>
+              </li>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </nav>
+  </div>
+
+  <div class="header__icons"></div>
+</header>
+
+{% render 'mobile-menu' %}
+
+{% schema %}
+{
+  "name": "t:sections.header.name",
+  "class": "section-header",
+  "max_blocks": 3,
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "pick_logo",
+      "label": "Change Logo"
+    },
+    {
+      "type": "select",
+      "id": "logo_position",
+      "options": [
+        {
+          "value": "top-left",
+          "label": "t:sections.header.settings.logo_position.options__2.label"
+        },
+        {
+          "value": "top-center",
+          "label": "t:sections.header.settings.logo_position.options__3.label"
+        },
+        {
+          "value": "middle-left",
+          "label": "t:sections.header.settings.logo_position.options__1.label"
+        },
+        {
+          "value": "middle-center",
+          "label": "t:sections.header.settings.logo_position.options__4.label"
+        }
+      ],
+      "default": "middle-left",
+      "label": "t:sections.header.settings.logo_position.label",
+      "info": "t:sections.header.settings.logo_help.content"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "default": "main-menu",
+      "label": "t:sections.header.settings.menu.label"
+    },
+    {
+      "type": "select",
+      "id": "menu_type_desktop",
+      "options": [
+        {
+          "value": "dropdown",
+          "label": "t:sections.header.settings.menu_type_desktop.options__1.label"
+        },
+        {
+          "value": "mega",
+          "label": "t:sections.header.settings.menu_type_desktop.options__2.label"
+        },
+        {
+          "value": "drawer",
+          "label": "t:sections.header.settings.menu_type_desktop.options__3.label"
+        }
+      ],
+      "default": "dropdown",
+      "label": "t:sections.header.settings.menu_type_desktop.label",
+      "info": "t:sections.header.settings.menu_type_desktop.info"
+    },
+    {
+      "type": "select",
+      "id": "sticky_header_type",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:sections.header.settings.sticky_header_type.options__1.label"
+        },
+        {
+          "value": "on-scroll-up",
+          "label": "t:sections.header.settings.sticky_header_type.options__2.label"
+        },
+        {
+          "value": "always",
+          "label": "t:sections.header.settings.sticky_header_type.options__3.label"
+        },
+        {
+          "value": "reduce-logo-size",
+          "label": "t:sections.header.settings.sticky_header_type.options__4.label"
+        }
+      ],
+      "default": "on-scroll-up",
+      "label": "t:sections.header.settings.sticky_header_type.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_line_separator",
+      "default": true,
+      "label": "t:sections.header.settings.show_line_separator.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.header.settings.header__1.content"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color_scheme",
+      "id": "menu_color_scheme",
+      "label": "t:sections.header.settings.menu_color_scheme.label",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.header.settings.header__3.content",
+      "info": "t:sections.header.settings.header__4.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_country_selector",
+      "default": true,
+      "label": "t:sections.header.settings.enable_country_selector.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.header.settings.header__5.content",
+      "info": "t:sections.header.settings.header__6.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_language_selector",
+      "default": true,
+      "label": "t:sections.header.settings.enable_language_selector.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.header.settings.header__7.content",
+      "info": "t:sections.header.settings.header__7.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_customer_avatar",
+      "default": true,
+      "label": "t:sections.header.settings.enable_customer_avatar.label",
+      "info": "t:sections.header.settings.enable_customer_avatar.info"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.header.settings.mobile_layout.content"
+    },
+    {
+      "type": "select",
+      "id": "mobile_logo_position",
+      "options": [
+        {
+          "value": "center",
+          "label": "t:sections.header.settings.mobile_logo_position.options__1.label"
+        },
+        {
+          "value": "left",
+          "label": "t:sections.header.settings.mobile_logo_position.options__2.label"
+        }
+      ],
+      "default": "center",
+      "label": "t:sections.header.settings.mobile_logo_position.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.spacing"
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.header.settings.margin_bottom.label",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 36,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 36,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "paddingx",
+      "min": 0,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "label": "paddingx",
+      "default": 6
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
+    }
+  ]
+}
+{% endschema %}
