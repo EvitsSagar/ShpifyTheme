@@ -32,12 +32,12 @@
             <button
               @click="mobilMenu = false"
               type="button"
-              class="relative rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+              class="relative rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white "
             >
               <span class="absolute -inset-2.5"></span>
               <span class="sr-only">Close panel</span>
               <svg
-                class="h-6 w-6"
+                class="h-8 w-8"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke-width="1.5"
@@ -54,14 +54,14 @@
               {% render 'search-input' %}
             </div>
             <div class="relative mt-6 flex-1 px-4 sm:px-6">
-              <ul role="list" class="text-black">
+              <ul role="list" class="text-black gap-4">
                 {%- for link in section.settings.menu.links -%}
-                  <li>
+                  <li class="my-6">
                     {%- if link.links != blank -%}
                       <noscript>
                         <a
                           href="{{ link.url }}"
-                          class="header__menu-item animate-link"
+                          class="header__menu-item animate-link "
                           {% if link.current %}
                             aria-current="page"
                           {% endif %}
@@ -81,10 +81,10 @@
                         x-cloak
                         class="{% if has_sub_menu %} has-sub-menu {% endif %}"
                       >
-                        <div class="flex justify-between items-center" :class="{ 'menu-active': openSubMenu }">
+                        <div class="flex justify-between items-center " :class="{ 'menu-active': openSubMenu }">
                           <a
                             href="{{ link.url }}"
-                            class="w-1/2 py-3 text-base inline-flex items-center"
+                            class="w-1/2 py-3 text-base inline-flex items-center "
                             {% if link.current %}
                               aria-current="page"
                             {% endif %}
@@ -106,7 +106,7 @@
                             {% for submenu in linklists[link.handle].links %}
                               {% if submenu.title != 'megamenu' %}
                                 <li>
-                                  <a href="{{ submenu.url }}" class="w-full py-3 block text-sm animate-link">
+                                  <a href="{{ submenu.url }}" class="w-full py-3 block animate-link ">
                                     <span class="inline-flex items-center">
                                       {{ submenu.title }}
                                     </span>
@@ -121,15 +121,21 @@
                     {%- else -%}
                       <a
                         href="{{ link.url }}"
-                        class="w-full py-3 block text-base animate-link"
+                        class="
+                          w-full block animate-link items-center text-gray-600 py-2 cursor-pointer hover:bg-gray-100 pl-2 pr-6 rounded-lg {% if link.current %}
+                          bg-indigo-100 {% else %}  {% endif %}
+                        "
                         {% if link.current %}
                           aria-current="page"
                         {% endif %}
                       >
                         <span
-                          {%- if link.current %}
-                            class="header__active-menu-item"
-                          {% endif %}
+                          class="
+                            text-2xl font-bold
+                            {%- if link.current %}
+                              header__active-menu-item text-indigo-500
+                            {% endif %}
+                          "
                         >
                           {{ link.title | escape }}
                         </span>

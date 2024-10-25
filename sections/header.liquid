@@ -48,7 +48,7 @@
         <img
           src="{{ section.settings.pick_logo | image_url: width: 480, height: 480 }}px"
           alt="{{ section.settings.image.alt | escape }}"
-          width="50"
+          width="{{ section.settings.LogoWidth }}"
           height="50"
         >
       </a>
@@ -115,6 +115,15 @@
       "type": "image_picker",
       "id": "pick_logo",
       "label": "Change Logo"
+    },
+    {
+      "type": "range",
+      "id": "LogoWidth",
+      "min": 50,
+      "max": 100,
+      "step": 1,
+      "label": "Logo Width",
+      "default": 50
     },
     {
       "type": "select",
