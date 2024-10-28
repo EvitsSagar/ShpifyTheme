@@ -37,19 +37,26 @@
   #menu-toggle:checked ~ .menu {
     transform: scale(1, 1);
   }
+
+  .HoverEffect::before {
+    background-color: {{section.settings.hover_color}};
+  }
+  .hover-shadow-before:hover:before{
+    box-shadow:0 0 5px {{section.settings.hover_color}};
+  }
 </style>
 <header
-  class="header border-y items-center bg-[#151418] shadow-2xl z-10"
-  style="margin-bottom:{{section.settings.margin_bottom}};padding:{{section.settings.padding_top}}px {{section.settings.paddingx}}px {{section.settings.padding_bottom}}px {{section.settings.paddingx}}px;"
+  class="header border-y items-center shadow-2xl z-10"
+  style="margin-bottom:{{section.settings.margin_bottom}};padding:{{section.settings.padding_top}}px {{section.settings.paddingx}}px {{section.settings.padding_bottom}}px {{section.settings.paddingx}}px; background-color:{{ section.settings.bg-color }}"
 >
   <div class="header__logo md:flex:justify-center">
-    {% if section.settings.pick_logo != blank %}
+    {% if settings.logo != blank %}
       <a href="/">
         <img
-          src="{{ section.settings.pick_logo | image_url: width: 480, height: 480 }}px"
+          src="{{ settings.logo | image_url }}"
           alt="{{ section.settings.image.alt | escape }}"
-          width="{{ section.settings.LogoWidth }}"
-          height="50"
+          width="{{ settings.logo_width }}px"
+          height="auto"
         >
       </a>
     {% else %}
@@ -65,9 +72,7 @@
       onclick="window.dispatchEvent(new CustomEvent('sidemenu'))"
       type="button"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#5f6368">
-        <g fill="none"><path d="M0 0h24v24H0V0z"/><path d="M0 0h24v24H0V0z" opacity=".87"/></g><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7zm-4 6h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
-      </svg>
+      {% render 'icon-menu' %}
     </button>
     <nav class="hidden md:flex">
       <ul class="menu">
@@ -100,7 +105,86 @@
     </nav>
   </div>
 
-  <div class="header__icons"></div>
+  <div
+    class="header__icons"
+    x-data="{ cart_count: {{ cart.item_count }} }"
+    @cart-count-updated.window="cart_count = $event.detail"
+  >
+    {%- if shop.customer_accounts_enabled -%}
+      <div class="relative account-menu-wrapper z-10">
+        <ul class="p-0 m-0 flex absolute  top-1/2 left-3/4 transform -translate-x-1/2 -translate-y-1/2">
+          <li class="list-none mx-[15px] my-0">
+            <a
+              style="--hover-color:{{section.settings.hover_color}}; --hover-text-shadow:0 0 5px {{section.settings.hover_color}}; --hover-box-shadow:0 0 5px {{section.settings.hover_color}}"
+              href="{{ routes.account_url }}"
+              title="account link"
+              class="flex justify-center items-center hover:before:scale-110 hover-shadow-before relative w-[31px] h-[31px] text-center leading-[60px] bg-[#333] rounded-[50%] text-[30px] text-[#666] transition duration-[0.5s] before:content-[''] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:rounded-full HoverEffect before:transition-transform before:duration-500 before:scale-90 before:z-[-1]"
+              href="#"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                enable-background="new 0 0 32 32"
+                height="32px"
+                width="32px"
+                viewBox="0 0 24 24"
+                fill="#fff"
+              >
+                <g><rect fill="none" height="40" width="40"/></g><g><g><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM7.35 18.5C8.66 17.56 10.26 17 12 17s3.34.56 4.65 1.5c-1.31.94-2.91 1.5-4.65 1.5s-3.34-.56-4.65-1.5zm10.79-1.38C16.45 15.8 14.32 15 12 15s-4.45.8-6.14 2.12C4.7 15.73 4 13.95 4 12c0-4.42 3.58-8 8-8s8 3.58 8 8c0 1.95-.7 3.73-1.86 5.12z"/><path d="M12 6c-1.93 0-3.5 1.57-3.5 3.5S10.07 13 12 13s3.5-1.57 3.5-3.5S13.93 6 12 6zm0 5c-.83 0-1.5-.67-1.5-1.5S11.17 8 12 8s1.5.67 1.5 1.5S12.83 11 12 11z"/></g></g>
+              </svg>
+              <span class="sr-only">
+                {%- liquid
+                  if customer
+                    echo 'customer.account_fallback' | t
+                  else
+                    echo 'customer.account_fallback' | t
+                  endif
+                -%}
+              </span>
+            </a>
+          </li>
+          <li class="list-none mx-[15px] my-0">
+            <a
+              href="{{ routes.account_url }}"
+              title="account link"
+              style="--hover-color:{{section.settings.hover_color}}; --hover-text-shadow:0 0 5px {{section.settings.hover_color}}; --hover-box-shadow:0 0 5px {{section.settings.hover_color}}"
+              class="flex justify-center items-center hover:before:scale-110 relative w-[31px] h-[31px] text-center leading-[60px] bg-[#333] rounded-[50%] text-[30px] text-[#666] transition duration-[0.5s] before:content-[''] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:rounded-full before:bg-[#ffee10] before:transition-transform before:duration-500 before:scale-90 before:z-[-1] hover-shadow-before HoverEffect"
+              href="#"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#fff">
+                <path d="M0 0h24v24H0V0z" fill="none"/><path d="M15.55 13c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.37-.66-.11-1.48-.87-1.48H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 15.37 5.48 17 7 17h12v-2H7l1.1-2h7.45zM6.16 6h12.15l-2.76 5H8.53L6.16 6zM7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+              </svg>
+            </a>
+            <span
+              x-text="cart_count"
+              class="cart__count min-w-[22px] text-sm min-h-[22px] absolute grid place-content-center rounded-full -top-3 -right-1 text-white bg-black"
+            >
+              {{ cart.item_count }}
+            </span>
+          </li>
+        </ul>
+      </div>
+    {%- endif -%}
+
+    {% comment %}
+      <button
+        type="button"
+        title="Cart button"
+        @click="$dispatch('toggle-cart')"
+        class="header__icon text-center relative"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#fff">
+          <path d="M0 0h24v24H0V0z" fill="none"/><path d="M15.55 13c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.37-.66-.11-1.48-.87-1.48H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 15.37 5.48 17 7 17h12v-2H7l1.1-2h7.45zM6.16 6h12.15l-2.76 5H8.53L6.16 6zM7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+        </svg>
+        <span class="sr-only">{{ 'templates.cart.cart' | t }}</span>
+        <span
+          x-text="cart_count"
+          class="cart__count min-w-[22px] text-sm min-h-[22px] absolute grid place-content-center rounded-full -top-3 -right-1 text-white bg-black"
+        >
+          {{ cart.item_count }}
+        </span>
+      </button>
+    {% endcomment %}
+  </div>
 </header>
 
 {% render 'mobile-menu' %}
@@ -126,29 +210,16 @@
       "default": 50
     },
     {
-      "type": "select",
-      "id": "logo_position",
-      "options": [
-        {
-          "value": "top-left",
-          "label": "t:sections.header.settings.logo_position.options__2.label"
-        },
-        {
-          "value": "top-center",
-          "label": "t:sections.header.settings.logo_position.options__3.label"
-        },
-        {
-          "value": "middle-left",
-          "label": "t:sections.header.settings.logo_position.options__1.label"
-        },
-        {
-          "value": "middle-center",
-          "label": "t:sections.header.settings.logo_position.options__4.label"
-        }
-      ],
-      "default": "middle-left",
-      "label": "t:sections.header.settings.logo_position.label",
-      "info": "t:sections.header.settings.logo_help.content"
+      "type": "color",
+      "id": "hover_color",
+      "label": "Pick Hover Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "bg-color",
+      "label": "Background color",
+      "default": "#151418"
     },
     {
       "type": "link_list",
@@ -156,131 +227,7 @@
       "default": "main-menu",
       "label": "t:sections.header.settings.menu.label"
     },
-    {
-      "type": "select",
-      "id": "menu_type_desktop",
-      "options": [
-        {
-          "value": "dropdown",
-          "label": "t:sections.header.settings.menu_type_desktop.options__1.label"
-        },
-        {
-          "value": "mega",
-          "label": "t:sections.header.settings.menu_type_desktop.options__2.label"
-        },
-        {
-          "value": "drawer",
-          "label": "t:sections.header.settings.menu_type_desktop.options__3.label"
-        }
-      ],
-      "default": "dropdown",
-      "label": "t:sections.header.settings.menu_type_desktop.label",
-      "info": "t:sections.header.settings.menu_type_desktop.info"
-    },
-    {
-      "type": "select",
-      "id": "sticky_header_type",
-      "options": [
-        {
-          "value": "none",
-          "label": "t:sections.header.settings.sticky_header_type.options__1.label"
-        },
-        {
-          "value": "on-scroll-up",
-          "label": "t:sections.header.settings.sticky_header_type.options__2.label"
-        },
-        {
-          "value": "always",
-          "label": "t:sections.header.settings.sticky_header_type.options__3.label"
-        },
-        {
-          "value": "reduce-logo-size",
-          "label": "t:sections.header.settings.sticky_header_type.options__4.label"
-        }
-      ],
-      "default": "on-scroll-up",
-      "label": "t:sections.header.settings.sticky_header_type.label"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_line_separator",
-      "default": true,
-      "label": "t:sections.header.settings.show_line_separator.label"
-    },
-    {
-      "type": "header",
-      "content": "t:sections.header.settings.header__1.content"
-    },
-    {
-      "type": "color_scheme",
-      "id": "color_scheme",
-      "label": "t:sections.all.colors.label",
-      "default": "scheme-1"
-    },
-    {
-      "type": "color_scheme",
-      "id": "menu_color_scheme",
-      "label": "t:sections.header.settings.menu_color_scheme.label",
-      "default": "scheme-1"
-    },
-    {
-      "type": "header",
-      "content": "t:sections.header.settings.header__3.content",
-      "info": "t:sections.header.settings.header__4.info"
-    },
-    {
-      "type": "checkbox",
-      "id": "enable_country_selector",
-      "default": true,
-      "label": "t:sections.header.settings.enable_country_selector.label"
-    },
-    {
-      "type": "header",
-      "content": "t:sections.header.settings.header__5.content",
-      "info": "t:sections.header.settings.header__6.info"
-    },
-    {
-      "type": "checkbox",
-      "id": "enable_language_selector",
-      "default": true,
-      "label": "t:sections.header.settings.enable_language_selector.label"
-    },
-    {
-      "type": "header",
-      "content": "t:sections.header.settings.header__7.content",
-      "info": "t:sections.header.settings.header__7.info"
-    },
-    {
-      "type": "checkbox",
-      "id": "enable_customer_avatar",
-      "default": true,
-      "label": "t:sections.header.settings.enable_customer_avatar.label",
-      "info": "t:sections.header.settings.enable_customer_avatar.info"
-    },
-    {
-      "type": "header",
-      "content": "t:sections.header.settings.mobile_layout.content"
-    },
-    {
-      "type": "select",
-      "id": "mobile_logo_position",
-      "options": [
-        {
-          "value": "center",
-          "label": "t:sections.header.settings.mobile_logo_position.options__1.label"
-        },
-        {
-          "value": "left",
-          "label": "t:sections.header.settings.mobile_logo_position.options__2.label"
-        }
-      ],
-      "default": "center",
-      "label": "t:sections.header.settings.mobile_logo_position.label"
-    },
-    {
-      "type": "header",
-      "content": "t:sections.all.spacing"
-    },
+
     {
       "type": "range",
       "id": "margin_bottom",
@@ -333,3 +280,156 @@
   ]
 }
 {% endschema %}
+
+{% comment %}
+     {
+      "type": "select",
+      "id": "logo_position",
+      "options": [
+        {
+          "value": "top-left",
+          "label": "t:sections.header.settings.logo_position.options__2.label"
+        },
+        {
+          "value": "top-center",
+          "label": "t:sections.header.settings.logo_position.options__3.label"
+        },
+        {
+          "value": "middle-left",
+          "label": "t:sections.header.settings.logo_position.options__1.label"
+        },
+        {
+          "value": "middle-center",
+          "label": "t:sections.header.settings.logo_position.options__4.label"
+        }
+      ],
+      "default": "middle-left",
+      "label": "t:sections.header.settings.logo_position.label",
+      "info": "t:sections.header.settings.logo_help.content"
+    },
+  {
+    "type": "select",
+    "id": "menu_type_desktop",
+    "options": [
+      {
+        "value": "dropdown",
+        "label": "t:sections.header.settings.menu_type_desktop.options__1.label"
+      },
+      {
+        "value": "mega",
+        "label": "t:sections.header.settings.menu_type_desktop.options__2.label"
+      },
+      {
+        "value": "drawer",
+        "label": "t:sections.header.settings.menu_type_desktop.options__3.label"
+      }
+    ],
+    "default": "dropdown",
+    "label": "t:sections.header.settings.menu_type_desktop.label",
+    "info": "t:sections.header.settings.menu_type_desktop.info"
+  },
+  {
+    "type": "select",
+    "id": "sticky_header_type",
+    "options": [
+      {
+        "value": "none",
+        "label": "t:sections.header.settings.sticky_header_type.options__1.label"
+      },
+      {
+        "value": "on-scroll-up",
+        "label": "t:sections.header.settings.sticky_header_type.options__2.label"
+      },
+      {
+        "value": "always",
+        "label": "t:sections.header.settings.sticky_header_type.options__3.label"
+      },
+      {
+        "value": "reduce-logo-size",
+        "label": "t:sections.header.settings.sticky_header_type.options__4.label"
+      }
+    ],
+    "default": "on-scroll-up",
+    "label": "t:sections.header.settings.sticky_header_type.label"
+  },
+  {
+    "type": "checkbox",
+    "id": "show_line_separator",
+    "default": true,
+    "label": "t:sections.header.settings.show_line_separator.label"
+  },
+  {
+    "type": "header",
+    "content": "t:sections.header.settings.header__1.content"
+  },
+  {
+    "type": "color_scheme",
+    "id": "color_scheme",
+    "label": "t:sections.all.colors.label",
+    "default": "scheme-1"
+  },
+  {
+    "type": "color_scheme",
+    "id": "menu_color_scheme",
+    "label": "t:sections.header.settings.menu_color_scheme.label",
+    "default": "scheme-1"
+  },
+  {
+    "type": "header",
+    "content": "t:sections.header.settings.header__3.content",
+    "info": "t:sections.header.settings.header__4.info"
+  },
+  {
+    "type": "checkbox",
+    "id": "enable_country_selector",
+    "default": true,
+    "label": "t:sections.header.settings.enable_country_selector.label"
+  },
+  {
+    "type": "header",
+    "content": "t:sections.header.settings.header__5.content",
+    "info": "t:sections.header.settings.header__6.info"
+  },
+  {
+    "type": "checkbox",
+    "id": "enable_language_selector",
+    "default": true,
+    "label": "t:sections.header.settings.enable_language_selector.label"
+  },
+  {
+    "type": "header",
+    "content": "t:sections.header.settings.header__7.content",
+    "info": "t:sections.header.settings.header__7.info"
+  },
+  {
+    "type": "checkbox",
+    "id": "enable_customer_avatar",
+    "default": true,
+    "label": "t:sections.header.settings.enable_customer_avatar.label",
+    "info": "t:sections.header.settings.enable_customer_avatar.info"
+  },
+  {
+    "type": "header",
+    "content": "t:sections.header.settings.mobile_layout.content"
+  },
+  {
+    "type": "select",
+    "id": "mobile_logo_position",
+    "options": [
+      {
+        "value": "center",
+        "label": "t:sections.header.settings.mobile_logo_position.options__1.label"
+      },
+      {
+        "value": "left",
+        "label": "t:sections.header.settings.mobile_logo_position.options__2.label"
+      }
+    ],
+    "default": "center",
+    "label": "t:sections.header.settings.mobile_logo_position.label"
+  },
+  {
+    "type": "header",
+    "content": "t:sections.all.spacing"
+  },
+{% endcomment %}
