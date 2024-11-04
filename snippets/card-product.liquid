@@ -10,24 +10,52 @@
       assign ratio = 1
     endif
   -%}
-  <div class="card-wrapper product-card-wrapper underline-links-hover">
-    <div class="max-w-sm rounded overflow-hidden shadow-lg mx-6 my-4">
+  <a
+    href="{{ card_product.url }}"
+    class="card-wrapper product-card-wrapper underline-links-hover group shadow-lg min-w-[60%]"
+  >
+    <div class="max-w-sm rounded overflow-hidden mx-6 my-4 ">
       {% if card_product.featured_media %}
-        {{ card_product.featured_media | image_url: width: 900 | image_tag: loading: 'lazy' }}
+        {% if card_product.media != empty %}
+          {% render 'carousel', products: card_product.media, class: 'group-hover:block' %}
+        {% endif %}
+
+        {{
+          card_product.featured_media
+          | image_url: width: 900
+          | image_tag: loading: 'lazy', class: 'group-hover:hidden'
+        }}
+
       {% else %}
         {{ 'collection-1' | placeholder_svg_tag: 'placeholder-svg' }}
       {% endif %}
 
       <div class="px-6 py-4">
         <div class="font-bold text-xl mb-2">{{ card_product.title }}</div>
-        <p class="text-gray-700 text-base">
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus quia, nulla! Maiores et perferendis
-          eaque, exercitationem praesentium nihil.
-        </p>
       </div>
-      <div class="px-6 pt-4 pb-2"></div>
+      <div class="px-6 pt-4 pb-2 grid grid-cols-3 gap-4">
+        {% if card_product.compare_at_price > card_product.price %}
+          <p class="text-xl font-semibold">
+            {{ card_product.price | money }}
+          </p>
+          {%- assign current_price = card_product.price | money_without_currency -%}
+          {%- assign comp_price = card_product.compare_at_price | money_without_currency -%}
+          {%- assign actual_price = comp_price | minus: current_price -%}
+          <p class="text-xl font-semibold text-green-400">{{ actual_price | divided_by: comp_price }}% Off</p>
+          <s class="text-red-500 ">
+            <p class="text-xl font-semibold">
+              {{ card_product.compare_at_price | money }}
+            </p>
+          </s>
+        {%- else -%}
+          <p class="text-xl font-semibold">
+            {{ card_product.price | money }}
+          </p>
+        {% endif %}
+      </div>
     </div>
-  </div>
+  </a>
+
 {%- else -%}
   {%- liquid
     assign ratio = 1
