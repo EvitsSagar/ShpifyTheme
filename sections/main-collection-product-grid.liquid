@@ -29,7 +29,7 @@
             <ul
               id="product-grid"
               data-id="{{ section.id }}"
-              class="grid grid-cols-4 gap-4 px-8"
+              class="grid {% if section.settings.card_style=="horizontal" %} sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4  {% else %}  grid-cols-4 {% endif %} gap-4 px-8"
             >
               {%- for product in collection.products -%}
                 <li
@@ -39,8 +39,23 @@
                     style="--animation-order: {{ forloop.index }};"
                   {% endif %}
                 >
-                  {%
-                    render 'card-product',+
+                  {% if section.settings.card_style == "vertical" %}
+                   
+                    {%
+                      render 'card-product',+
+                      card_product: product,
+                      media_aspect_ratio: section.settings.image_ratio,
+                      image_shape: section.settings.image_shape,
+                      show_secondary_image: section.settings.show_secondary_image,
+                      show_vendor: section.settings.show_vendor,
+                      show_rating: section.settings.show_rating,
+                      quick_add: section.settings.quick_add,
+                      section_id: section.id,
+                      description_lines:section.settings.description_lines
+                    %}
+                  
+                  {% elsif section.settings.card_style=="horizontal" %}
+                  {% render 'horizontal-card-product',
                     card_product: product,
                     media_aspect_ratio: section.settings.image_ratio,
                     image_shape: section.settings.image_shape,
@@ -48,9 +63,11 @@
                     show_vendor: section.settings.show_vendor,
                     show_rating: section.settings.show_rating,
                     quick_add: section.settings.quick_add,
-                    section_id: section.id
+                    section_id: section.id,
+                    description_lines: section.settings.description_lines
                   %}
                 </li>
+                {% endif %}
               {%- endfor -%}
             </ul>
 
@@ -100,6 +117,54 @@
     {
       "type": "header",
       "content": "t:sections.main-collection-product-grid.settings.header__3.content"
+    },
+    {
+      "type": "select",
+      "id": "card_style",
+      "options": [
+        {
+          "value": "vertical",
+          "label": "Card style vertical"
+        },
+        {
+          "value": "horizontal",
+          "label": "Card style horizontal"
+        }
+      ],
+      "label": "Card Style",
+      "default": "vertical"
+    },
+    {
+      "type": "select",
+      "id": "description_lines",
+      "options": [
+        {
+          "value": "line-clamp-1",
+          "label": "One Line Discription"
+        },
+        {
+          "value": "line-clamp-2",
+          "label": "Two Line's of Discription"
+        },
+        {
+          "value": "line-clamp-3",
+          "label": "Three Line's of Discription"
+        },
+        {
+          "value": "line-clamp-4",
+          "label": "Four Line's of Discription"
+        },
+        {
+          "value": "line-clamp-5",
+          "label": "Five Line's of Discription"
+        },
+        {
+          "value": "line-clamp-6",
+          "label": "Six Line's of Discription"
+        }
+      ],
+      "label": "Discription Lines",
+      "default": "line-clamp-1"
     },
     {
       "type": "select",

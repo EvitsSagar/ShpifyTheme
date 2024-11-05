@@ -15,26 +15,41 @@
     class="card-wrapper product-card-wrapper underline-links-hover group shadow-lg min-w-[60%]"
   >
     <div class="max-w-sm rounded overflow-hidden mx-6 my-4 ">
-      {% if card_product.featured_media %}
-        {% if card_product.media != empty %}
-          {% render 'carousel', products: card_product.media, class: 'group-hover:block' %}
+      <div class="h-96 w-96">
+        {% if card_product.featured_media %}
+          {% if card_product.media != empty %}
+            {% render 'carousel',
+              products: card_product.media,
+              class: 'group-hover:block',
+              image_css: 'min-h-[21.2rem]'
+            %}
+          {% endif %}
+
+          {{
+            card_product.featured_media
+            | image_url: width: 900
+            | image_tag: loading: 'lazy', class: 'group-hover:hidden'
+          }}
+
+        {% else %}
+          {{ 'collection-1' | placeholder_svg_tag: 'placeholder-svg' }}
         {% endif %}
+      </div>
 
-        {{
-          card_product.featured_media
-          | image_url: width: 900
-          | image_tag: loading: 'lazy', class: 'group-hover:hidden'
-        }}
-
-      {% else %}
-        {{ 'collection-1' | placeholder_svg_tag: 'placeholder-svg' }}
-      {% endif %}
-
-      <div class="px-6 py-4">
+      <div class="py-4">
         <div class="font-bold text-xl mb-2">{{ card_product.title }}</div>
       </div>
-      <div class="px-6 pt-4 pb-2 grid grid-cols-3 gap-4">
+
+      <p class="{{ description_lines }}">
+        {{ card_product.description }}
+      </p>
+      <div class="pt-4 pb-2 grid grid-cols-3 gap-4">
         {% if card_product.compare_at_price > card_product.price %}
+          <s class="text-red-500 ">
+            <p class="text-xl font-semibold">
+              {{ card_product.compare_at_price | money }}
+            </p>
+          </s>
           <p class="text-xl font-semibold">
             {{ card_product.price | money }}
           </p>
@@ -42,11 +57,6 @@
           {%- assign comp_price = card_product.compare_at_price | money_without_currency -%}
           {%- assign actual_price = comp_price | minus: current_price -%}
           <p class="text-xl font-semibold text-green-400">{{ actual_price | divided_by: comp_price }}% Off</p>
-          <s class="text-red-500 ">
-            <p class="text-xl font-semibold">
-              {{ card_product.compare_at_price | money }}
-            </p>
-          </s>
         {%- else -%}
           <p class="text-xl font-semibold">
             {{ card_product.price | money }}
