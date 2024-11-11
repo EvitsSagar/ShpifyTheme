@@ -3,161 +3,87 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Product Viewer</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <style>
+    :root {
+      --display: none;
+      --img: url('');
+      --zoom-x: 50%;
+      --zoom-y: 50%;
+    }
 
-<script src="https://cdn.tailwindcss.com"></script>
-
+    .productPageFullImage::after {
+      content: "";
+      display: var(--display);
+      background-image: var(--img);
+      background-size: 200%;
+      background-position: var(--zoom-x) var(--zoom-y);
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      top: 0;
+      left: 0;
+      z-index: 2;
+      pointer-events: none;
+    }
+  </style>
 </head>
 <body>
-  
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-  </head>
- <body>
-   
-  <div
-  
-  id="carouselDarkVariant"
-  class="relative"
-  data-twe-carousel-init
-  data-twe-ride="carousel">
-  <!-- Carousel indicators -->
-  <div
-    class="absolute inset-x-0 bottom-0 z-[2] mx-[15%] mb-4 flex list-none justify-center p-0"
-    data-twe-carousel-indicators>
-    <button
-      data-twe-target="#carouselDarkVariant"
-      data-twe-slide-to="0"
-      data-twe-carousel-active
-      class="mx-[3px] box-content h-[3px] w-[30px] flex-initial cursor-pointer border-0 border-y-[10px] border-solid border-transparent bg-black bg-clip-padding p-0 -indent-[999px] opacity-50 transition-opacity duration-[600ms] ease-[cubic-bezier(0.25,0.1,0.25,1.0)] motion-reduce:transition-none"
-      aria-current="true"
-      aria-label="Slide 1"></button>
-    <button
-      data-twe-target="#carouselDarkVariant"
-      class="mx-[3px] box-content h-[3px] w-[30px] flex-initial cursor-pointer border-0 border-y-[10px] border-solid border-transparent bg-black bg-clip-padding p-0 -indent-[999px] opacity-50 transition-opacity duration-[600ms] ease-[cubic-bezier(0.25,0.1,0.25,1.0)] motion-reduce:transition-none"
-      data-twe-slide-to="1"
-      aria-label="Slide 1"></button>
-    <button
-      data-twe-target="#carouselDarkVariant"
-      class="mx-[3px] box-content h-[3px] w-[30px] flex-initial cursor-pointer border-0 border-y-[10px] border-solid border-transparent bg-black bg-clip-padding p-0 -indent-[999px] opacity-50 transition-opacity duration-[600ms] ease-[cubic-bezier(0.25,0.1,0.25,1.0)] motion-reduce:transition-none"
-      data-twe-slide-to="2"
-      aria-label="Slide 1"></button>
-  </div>
 
-  <!-- Carousel items -->
-  <div
-    class="relative w-full overflow-hidden after:clear-both after:block after:content-['']">
-    <!-- First item -->
-    <div
-      class="relative float-left -mr-[100%] w-full !transform-none opacity-0 transition-opacity duration-[600ms] ease-in-out motion-reduce:transition-none"
-      data-twe-carousel-fade
-      data-twe-carousel-item
-      data-twe-carousel-active>
-      <img
-        src="https://mdbcdn.b-cdn.net/img/Photos/Slides/img%20(19).webp"
-        class="block w-full"
-        alt="Motorbike Smoke" />
-      <div
-        class="absolute inset-x-[15%] bottom-5 hidden py-5 text-center text-black md:block">
-        <h5 class="text-xl">First slide label</h5>
-        <p>
-          Some representative placeholder content for the first slide.
-        </p>
-      </div>
+<div x-data="productViewer()" class="productPageContainer flex justify-center items-center h-[500px]">
+  <div class="productPageImgContainer grid grid-cols-3 gap-4 h-[500px] w-1/2">
+
+    <div>
+      <template x-for="(image, index) in images" :key="index">
+        <div :class="{ 'opacity-50': selectedImage !== index, 'selected': selectedImage === index }"
+             @click="selectImage(index)"
+             class="image hover:scale-105 hover:opacity-100 transition-all rounded-lg">
+          <img :src="image" class="rounded-lg" alt="">
+        </div>
+      </template>
     </div>
-    <!-- Second item -->
-    <div
-      class="relative float-left -mr-[100%] hidden w-full !transform-none opacity-0 transition-opacity duration-[600ms] ease-in-out motion-reduce:transition-none"
-      data-twe-carousel-fade
-      data-twe-carousel-item>
-      <img
-        src="https://mdbcdn.b-cdn.net/img/Photos/Slides/img%20(35).webp"
-        class="block w-full"
-        alt="Mountaintop" />
-      <div
-        class="absolute inset-x-[15%] bottom-5 hidden py-5 text-center text-black md:block">
-        <h5 class="text-xl">Second slide label</h5>
-        <p>
-          Some representative placeholder content for the second slide.
-        </p>
-      </div>
-    </div>
-    <!-- Third item -->
-    <div
-      class="relative float-left -mr-[100%] hidden w-full !transform-none opacity-0 transition-opacity duration-[600ms] ease-in-out motion-reduce:transition-none"
-      data-twe-carousel-fade
-      data-twe-carousel-item>
-      <img
-        src="https://mdbcdn.b-cdn.net/img/Photos/Slides/img%20(40).webp"
-        class="block w-full"
-        alt="Woman Reading a Book" />
-      <div
-        class="absolute inset-x-[15%] bottom-5 hidden py-5 text-center text-black md:block">
-        <h5 class="text-xl">Third slide label</h5>
-        <p>
-          Some representative placeholder content for the third slide.
-        </p>
-      </div>
+
+  
+    <div class="col-span-2 productPageFullImage relative h-full flex justify-center items-center border-l-2 border-white"
+         @mousemove="zoomImage($event)" @mouseleave="hideZoom">
+      <img :src="images[selectedImage]" alt="">
     </div>
   </div>
-
-  <!-- Carousel controls - prev item-->
-  <button
-    class="absolute bottom-0 left-0 top-0 z-[1] flex w-[15%] items-center justify-center border-0 bg-none p-0 text-center text-black opacity-50 transition-opacity duration-150 ease-[cubic-bezier(0.25,0.1,0.25,1.0)] hover:text-black hover:no-underline hover:opacity-90 hover:outline-none focus:text-black focus:no-underline focus:opacity-90 focus:outline-none motion-reduce:transition-none"
-    type="button"
-    data-twe-target="#carouselDarkVariant"
-    data-twe-slide="prev">
-    <span class="inline-block h-8 w-8 dark:grayscale">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="h-6 w-6">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M15.75 19.5L8.25 12l7.5-7.5" />
-      </svg>
-    </span>
-    <span
-      class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
-      >Previous</span
-    >
-  </button>
-  <!-- Carousel controls - next item-->
-  <button
-    class="absolute bottom-0 right-0 top-0 z-[1] flex w-[15%] items-center justify-center border-0 bg-none p-0 text-center text-black opacity-50 transition-opacity duration-150 ease-[cubic-bezier(0.25,0.1,0.25,1.0)] hover:text-black hover:no-underline hover:opacity-90 hover:outline-none focus:text-black focus:no-underline focus:opacity-90 focus:outline-none motion-reduce:transition-none"
-    type="button"
-    data-twe-target="#carouselDarkVariant"
-    data-twe-slide="next">
-    <span class="inline-block h-8 w-8 dark:grayscale">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="h-6 w-6">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-      </svg>
-    </span>
-    <span
-      class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
-      >Next</span
-    >
-  </button>
 </div>
 
- </body>
-  </html>
+<script>
+  function productViewer() {
+    return {
+      images: [
+        "https://ae-pic-a1.aliexpress-media.com/kf/S48558717bb524353a75a1a953674118bM.jpg_640x640.jpg_.webp",
+        "https://ae-pic-a1.aliexpress-media.com/kf/Sc7e88f5107a94626982111bc6d6d8f658.jpg_640x640.jpg_.webp",
+        "https://static.wixstatic.com/media/a9292d_ca85f68ff3544498aaf8ef3acef544a9~mv2.jpg/v1/fill/w_500,h_667,al_c,lg_1,q_80,enc_auto/a9292d_ca85f68ff3544498aaf8ef3acef544a9~mv2.jpg",
+        "https://img12.360buyimg.com/n1/s450x450_jfs/t1/104537/6/18436/127307/5e955f28Eb1315a73/d86d37c58d3bf37d.jpg"
+      ],
+      selectedImage: 0,
+      init() {
+        this.updateZoomImage(); // Set initial image for zoom background without showing zoom overlay
+      },
+      selectImage(index) {
+        this.selectedImage = index;
+        this.updateZoomImage();
+      },
+      updateZoomImage() {
+        document.documentElement.style.setProperty("--img", `url(${this.images[this.selectedImage]})`);
+      },
+      zoomImage(event) {
+        document.documentElement.style.setProperty("--display", "block");
+        document.documentElement.style.setProperty("--zoom-x", `${event.offsetX / event.target.offsetWidth * 100}%`);
+        document.documentElement.style.setProperty("--zoom-y", `${event.offsetY / event.target.offsetHeight * 100}%`);
+      },
+      hideZoom() {
+        document.documentElement.style.setProperty("--display", "none");
+      }
+    };
+  }
+</script>
+
 </body>
 </html>

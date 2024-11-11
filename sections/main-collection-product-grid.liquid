@@ -29,7 +29,7 @@
             <ul
               id="product-grid"
               data-id="{{ section.id }}"
-              class="grid {% if section.settings.card_style=="horizontal" %} sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4  {% else %}  grid-cols-4 {% endif %} gap-4 px-8"
+              class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 {% if section.settings.card_style=="horizontal" %} xl:grid-cols-4 {% else %}  xl:grid-cols-5 {% endif %} gap-4 px-8"
             >
               {%- for product in collection.products -%}
                 <li
