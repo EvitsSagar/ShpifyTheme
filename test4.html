@@ -1,91 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        .container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-.card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-around;
-  width: 260px;
-  padding: 20px 1px;
-  margin: 10px 0;
-  text-align: center;
-  position: relative;
-  cursor: pointer;
-  box-shadow: 0 10px 15px -3px rgba(33,150,243,.4),0 4px 6px -4px rgba(33,150,243,.4);
-  border-radius: 10px;
-  background-color: #6B6ECC;
-  background: linear-gradient(45deg, #04051dea 0%, #2b566e 100%);
-}
-
-.content {
-  padding: 20px;
-}
-
-.content .price {
-  color: white;
-  font-weight: 800;
-  font-size: 50px;
-  text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.42);
-}
-
-.content .description {
-  color: rgba(255, 255, 255, 0.6);
-  margin-top: 10px;
-  font-size: 14px;
-}
-
-.content .title {
-  font-weight: 800;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.64);
-  margin-top: 10px;
-  font-size: 25px;
-  letter-spacing: 1px;
-}
-
-button {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
-  border: none;
-  outline: none;
-  color: rgb(255 255 255);
-  text-transform: uppercase;
-  font-weight: 700;
-  font-size: .75rem;
-  padding: 0.75rem 1.5rem;
-  background-color: rgb(33 150 243);
-  border-radius: 0.5rem;
-  width: 90%;
-  text-shadow: 0px 4px 18px #2c3442;
-}
-
-
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body>
-    <div class="container">
-        <div class="card">
-              <div class="content">
-                <div class="title">Personal edition</div>
-                <div class="price">$19.99</div>
-                <div class="description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur at posuere eros. Interdum et malesuada fames ac ante ipsum primis in faucibus.</div>
-              </div>
-                <button>
-                  Buy now
-                </button>
+<body class="font-raleway">
+  <div class="flex flex-col items-center justify-center min-h-screen">
+    <div class="text-center w-full flex flex-wrap justify-center" x-data="{ selected:'biking' }">
+
+      <!-- Biking -->
+      <label class="cursor-pointer m-2">
+        <input type="radio" name="radio" x-model="selected" value="biking" class="hidden">
+        <span 
+          class="radio-btn relative inline-block w-56 h-60 rounded-lg border-2 border-transparent shadow-md p-4 transition-all ease-in-out duration-500" :class="{ 'border-pink-200': selected === 'biking' }">
+          <i class="checkmark absolute text-white bg-pink-200 text-lg top-[-15px] left-1/2 transform -translate-x-1/2 scale-150 rounded-full p-1 transition-all duration-500 pointer-events-none"
+             :class="{ 'opacity-100 scale-100': selected === 'biking', 'opacity-0 scale-150': selected !== 'biking' }">✔</i>
+          <div class="hobbies-icon">
+            <img src="https://img.freepik.com/free-vector/sport-equipment-concept_1284-13034.jpg?size=626&ext=jpg" class="w-36 mx-auto mb-4">
+            <h3 class="text-gray-600 font-light uppercase tracking-wide text-lg">Biking</h3>
           </div>
+        </span>
+      </label>
+
+      <!-- Literature -->
+      <label class="cursor-pointer m-2">
+        <input type="radio" name="radio" x-model="selected" value="literature" class="hidden">
+        <span 
+          class="radio-btn relative inline-block w-56 h-60 rounded-lg border-2 border-transparent shadow-md p-4 transition-all ease-in-out duration-500"
+          :class="{ 'border-pink-200': selected === 'literature' }">
+          <i class="checkmark absolute text-white bg-pink-200 text-lg top-[-15px] left-1/2 transform -translate-x-1/2 scale-150 rounded-full p-1 transition-all duration-500 pointer-events-none"
+             :class="{ 'opacity-100 scale-100': selected === 'literature', 'opacity-0 scale-150': selected !== 'literature' }">✔</i>
+          <div class="hobbies-icon">
+            <img src="https://img.freepik.com/free-vector/hand-drawn-flat-design-poetry-illustration_23-2149279810.jpg?size=626&ext=jpg" class="w-36 mx-auto mb-4">
+            <h3 class="text-gray-600 font-light uppercase tracking-wide text-lg">Literature</h3>
           </div>
+        </span>
+      </label>
+
+      <label class="cursor-pointer m-2">
+        <input type="radio" name="radio" x-model="selected" value="music" class="hidden">
+        <span 
+          class="radio-btn relative inline-block w-56 h-60 rounded-lg border-2 border-transparent shadow-md p-4 transition-all ease-in-out duration-500"
+          :class="{ 'border-pink-200': selected === 'music' }">
+          <i class="checkmark absolute text-white bg-pink-200 text-lg top-[-15px] left-1/2 transform -translate-x-1/2 scale-150 rounded-full p-1 transition-all duration-500 pointer-events-none"
+             :class="{ 'opacity-100 scale-100': selected === 'music', 'opacity-0 scale-150': selected !== 'music' }">✔</i>
+          <div class="hobbies-icon">
+            <img src="https://img.freepik.com/free-vector/hand-drawn-twerk-illustration_23-2149447957.jpg?size=626&ext=jpg" class="w-36 mx-auto mb-4">
+            <h3 class="text-gray-600 font-light uppercase tracking-wide text-lg">Music</h3>
+          </div>
+        </span>
+      </label>
+
+      <!-- Science -->
+      <label class="cursor-pointer m-2">
+        <input type="radio" name="radio" x-model="selected" value="science" class="hidden">
+        <span 
+          class="radio-btn relative inline-block w-56 h-60 rounded-lg border-2 border-transparent shadow-md p-4 transition-all ease-in-out duration-500"
+          :class="{ 'border-pink-200': selected === 'science' }">
+          <i class="checkmark absolute text-white bg-pink-200 text-lg top-[-15px] left-1/2 transform -translate-x-1/2 scale-150 rounded-full p-1 transition-all duration-500 pointer-events-none"
+             :class="{ 'opacity-100 scale-100': selected === 'science', 'opacity-0 scale-150': selected !== 'science' }">✔</i>
+          <div class="hobbies-icon">
+            <img src="https://img.freepik.com/free-vector/chemist-concept-illustration_114360-10142.jpg?size=626&ext=jpg" class="w-36 mx-auto mb-4">
+            <h3 class="text-gray-600 font-light uppercase tracking-wide text-lg">Science</h3>
+          </div>
+        </span>
+      </label>
+
+    </div>
+  </div>
 </body>
 </html>

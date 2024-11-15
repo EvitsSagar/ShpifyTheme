@@ -12,7 +12,7 @@
   -%}
   <a
     href="{{ card_product.url }}"
-    class="card-wrapper product-card-wrapper underline-links-hover group shadow-lg min-w-[60%]"
+    class="card-wrapper product-card-wrapper underline-links-hover group min-w-[60%] flex justify-center"
   >
     <div class="max-w-sm rounded overflow-hidden mx-6 my-4 ">
       <div class="h-96 w-96">
@@ -28,7 +28,7 @@
           {{
             card_product.featured_media
             | image_url: width: 900
-            | image_tag: loading: 'lazy', class: 'group-hover:hidden'
+            | image_tag: loading: 'lazy', class: 'group-hover:hidden aspect-square'
           }}
 
         {% else %}

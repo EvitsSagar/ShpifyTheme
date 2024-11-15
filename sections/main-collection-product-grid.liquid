@@ -1,8 +1,8 @@
-<div class="section-{{ section.id }}-padding gradient color-{{ section.settings.color_scheme }}">
+<div class="section-{{ section.id }}-padding gradient color-{{ section.settings.color_scheme }} ">
   {%- paginate collection.products by section.settings.products_per_page -%}
     <div class="{% if section.settings.filter_type == 'vertical' %} facets-vertical page-width{% endif %}">
       <div
-        class="product-grid-container{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+        class="product-grid-container{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %} px-[27px]"
         id="ProductGridContainer"
         {% if settings.animations_reveal_on_scroll %}
           data-cascade
@@ -24,16 +24,16 @@
           </div>
         {%- else -%}
           <div
-            class="collection{% if section.settings.filter_type != 'vertical' %} page-width{% endif %}"
+            class="collection{% if section.settings.filter_type != 'vertical' %} page-width{% endif %} max-w-page mx-auto"
           >
             <ul
               id="product-grid"
               data-id="{{ section.id }}"
-              class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 {% if section.settings.card_style=="horizontal" %} xl:grid-cols-4 {% else %}  xl:grid-cols-5 {% endif %} gap-4 px-8"
+              class="grid sm:grid-cols-2 md:grid-cols-3 {% if section.settings.card_style=="horizontal" %} xl:grid-cols-3 {% else %}  xl:grid-cols-4 {% endif %} gap-16"
             >
               {%- for product in collection.products -%}
                 <li
-                  class="grid__item{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %} flex justify-center"
+                  class="grid__item{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %} border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
                   {% if settings.animations_reveal_on_scroll %}
                     data-cascade
                     style="--animation-order: {{ forloop.index }};"

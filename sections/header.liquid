@@ -46,144 +46,126 @@
   }
 </style>
 <header
-  class="header border-y items-center shadow-2xl z-10"
+  class="border-y shadow-2xl z-10 "
   style="margin-bottom:{{section.settings.margin_bottom}};padding:{{section.settings.padding_top}}px {{section.settings.paddingx}}px {{section.settings.padding_bottom}}px {{section.settings.paddingx}}px; background-color:{{ section.settings.bg-color }}"
 >
-  <div class="header__logo md:flex:justify-center">
-    {% if settings.logo != blank %}
-      <a href="/">
-        <img
-          src="{{ settings.logo | image_url }}"
-          alt="{{ section.settings.image.alt | escape }}"
-          width="{{ settings.logo_width }}px"
-          height="auto"
-        >
-      </a>
-    {% else %}
-      <div class="text-xl font-bold text-white sm:flex:justify-center">
-        <a href="/">{{ shop.name }}</a>
-      </div>
-    {% endif %}
-  </div>
+  <div class="header items-center max-w-page mx-auto">
+    <div class="header__logo md:flex:justify-center">
+      {% if settings.logo != blank %}
+        <a href="/">
+          <img
+            src="{{ settings.logo | image_url }}"
+            alt="{{ section.settings.image.alt | escape }}"
+            width="{{ settings.logo_width }}px"
+            height="auto"
+          >
+        </a>
+      {% else %}
+        <div class="text-xl font-bold text-white sm:flex:justify-center">
+          <a href="/">{{ shop.name }}</a>
+        </div>
+      {% endif %}
+    </div>
 
-  <div class="header__menu flex">
-    <button
-      class="md:hidden text-white bg-gradient-to-r from-[#F4F6FF] via-[#F5F7F8] to-[#F4F6FF] hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-[#F4F6FF] dark:focus:ring-cyan-800 shadow-lg shadow-[#EEF7FF]/50 dark:shadow-lg dark:shadow-[#EEF7FF]/80 font-medium rounded-lg text-sm  text-center p-2"
-      onclick="window.dispatchEvent(new CustomEvent('sidemenu'))"
-      type="button"
-    >
-      {% render 'icon-menu' %}
-    </button>
-    <nav class="hidden md:flex">
-      <ul class="menu">
-        {% for link in section.settings.menu.links %}
-          {% if link != blank %}
-            {% if link.links != blank %}
-              <li>
-                <a
-                  class="nav__item py-5 px-4 block hover:text-gray-300 transition-colors {% if link.current %} opacity-100 text-white {% else %} opacity-40 {% endif %}"
-                  href="{{ link.url }}"
-                >
-                  {{- link.title -}}
-                </a>
-              </li>
-              {% for childLink in link.links %}
-              {% endfor %}
-            {% else %}
-              <li>
-                <a
-                  class="nav__item py-5 px-4 block hover:text-gray-300 transition-colors {% if link.current %} opacity-100 text-white {% else %} opacity-40 {% endif %}"
-                  href="{{ link.url }}"
-                >
-                  {{- link.title -}}
-                </a>
-              </li>
-            {% endif %}
-          {% endif %}
-        {% endfor %}
-      </ul>
-    </nav>
-  </div>
-
-  <div
-    class="header__icons"
-    x-data="{ cart_count: {{ cart.item_count }} }"
-    @cart-count-updated.window="cart_count = $event.detail"
-  >
-    {%- if shop.customer_accounts_enabled -%}
-      <div class="relative account-menu-wrapper z-10">
-        <ul class="p-0 m-0 flex absolute  top-1/2 left-3/4 transform -translate-x-1/2 -translate-y-1/2">
-          <li class="list-none mx-[15px] my-0">
-            <a
-              style="--hover-color:{{section.settings.hover_color}}; --hover-text-shadow:0 0 5px {{section.settings.hover_color}}; --hover-box-shadow:0 0 5px {{section.settings.hover_color}}"
-              href="{{ routes.account_url }}"
-              title="account link"
-              class="flex justify-center items-center hover:before:scale-110 hover-shadow-before relative w-[31px] h-[31px] text-center leading-[60px] bg-[#333] rounded-[50%] text-[30px] text-[#666] transition duration-[0.5s] before:content-[''] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:rounded-full HoverEffect before:transition-transform before:duration-500 before:scale-90 before:z-[-1]"
-              href="#"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                enable-background="new 0 0 32 32"
-                height="32px"
-                width="32px"
-                viewBox="0 0 24 24"
-                fill="#fff"
-              >
-                <g><rect fill="none" height="40" width="40"/></g><g><g><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM7.35 18.5C8.66 17.56 10.26 17 12 17s3.34.56 4.65 1.5c-1.31.94-2.91 1.5-4.65 1.5s-3.34-.56-4.65-1.5zm10.79-1.38C16.45 15.8 14.32 15 12 15s-4.45.8-6.14 2.12C4.7 15.73 4 13.95 4 12c0-4.42 3.58-8 8-8s8 3.58 8 8c0 1.95-.7 3.73-1.86 5.12z"/><path d="M12 6c-1.93 0-3.5 1.57-3.5 3.5S10.07 13 12 13s3.5-1.57 3.5-3.5S13.93 6 12 6zm0 5c-.83 0-1.5-.67-1.5-1.5S11.17 8 12 8s1.5.67 1.5 1.5S12.83 11 12 11z"/></g></g>
-              </svg>
-              <span class="sr-only">
-                {%- liquid
-                  if customer
-                    echo 'customer.account_fallback' | t
-                  else
-                    echo 'customer.account_fallback' | t
-                  endif
-                -%}
-              </span>
-            </a>
-          </li>
-          <li class="list-none mx-[15px] my-0">
-            <a
-              href="{{ routes.account_url }}"
-              title="account link"
-              style="--hover-color:{{section.settings.hover_color}}; --hover-text-shadow:0 0 5px {{section.settings.hover_color}}; --hover-box-shadow:0 0 5px {{section.settings.hover_color}}"
-              class="flex justify-center items-center hover:before:scale-110 relative w-[31px] h-[31px] text-center leading-[60px] bg-[#333] rounded-[50%] text-[30px] text-[#666] transition duration-[0.5s] before:content-[''] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:rounded-full before:bg-[#ffee10] before:transition-transform before:duration-500 before:scale-90 before:z-[-1] hover-shadow-before HoverEffect"
-              href="#"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#fff">
-                <path d="M0 0h24v24H0V0z" fill="none"/><path d="M15.55 13c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.37-.66-.11-1.48-.87-1.48H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 15.37 5.48 17 7 17h12v-2H7l1.1-2h7.45zM6.16 6h12.15l-2.76 5H8.53L6.16 6zM7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
-              </svg>
-            </a>
-            <span
-              x-text="cart_count"
-              class="cart__count min-w-[22px] text-sm min-h-[22px] absolute grid place-content-center rounded-full -top-3 -right-1 text-white bg-black"
-            >
-              {{ cart.item_count }}
-            </span>
-          </li>
-        </ul>
-      </div>
-    {%- endif -%}
-
-    {% comment %}
+    <div class="header__menu flex">
       <button
+        class="md:hidden text-white bg-gradient-to-r from-[#F4F6FF] via-[#F5F7F8] to-[#F4F6FF] hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-[#F4F6FF] dark:focus:ring-cyan-800 shadow-lg shadow-[#EEF7FF]/50 dark:shadow-lg dark:shadow-[#EEF7FF]/80 font-medium rounded-lg text-sm  text-center p-2"
+        onclick="window.dispatchEvent(new CustomEvent('sidemenu'))"
         type="button"
-        title="Cart button"
-        @click="$dispatch('toggle-cart')"
-        class="header__icon text-center relative"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#fff">
-          <path d="M0 0h24v24H0V0z" fill="none"/><path d="M15.55 13c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.37-.66-.11-1.48-.87-1.48H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 15.37 5.48 17 7 17h12v-2H7l1.1-2h7.45zM6.16 6h12.15l-2.76 5H8.53L6.16 6zM7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
-        </svg>
-        <span class="sr-only">{{ 'templates.cart.cart' | t }}</span>
-        <span
-          x-text="cart_count"
-          class="cart__count min-w-[22px] text-sm min-h-[22px] absolute grid place-content-center rounded-full -top-3 -right-1 text-white bg-black"
-        >
-          {{ cart.item_count }}
-        </span>
+        {% render 'icon-menu' %}
       </button>
-    {% endcomment %}
+      <nav class="hidden md:flex">
+        <ul class="menu">
+          {% for link in section.settings.menu.links %}
+            {% if link != blank %}
+              {% if link.links != blank %}
+                <li>
+                  <a
+                    class="nav__item py-5 px-4 block hover:text-gray-300 transition-colors {% if link.current %} opacity-100 text-white {% else %} opacity-40 {% endif %}"
+                    href="{{ link.url }}"
+                  >
+                    {{- link.title -}}
+                  </a>
+                </li>
+                {% for childLink in link.links %}
+                {% endfor %}
+              {% else %}
+                <li>
+                  <a
+                    class="nav__item py-5 px-4 block hover:text-gray-300 transition-colors {% if link.current %} opacity-100 text-white {% else %} opacity-40 {% endif %}"
+                    href="{{ link.url }}"
+                  >
+                    {{- link.title -}}
+                  </a>
+                </li>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </nav>
+    </div>
+
+    <div
+      class="header__icons"
+      x-data="{ cart_count: {{ cart.item_count }} }"
+      @cart-count-updated.window="cart_count = $event.detail"
+    >
+      {%- if shop.customer_accounts_enabled -%}
+        <div class="relative account-menu-wrapper z-10">
+          <ul class="p-0 m-0 flex absolute  top-1/2 left-3/4 transform -translate-x-1/2 -translate-y-1/2">
+            <li class="list-none mx-[15px] my-0">
+              <a
+                style="--hover-color:{{section.settings.hover_color}}; --hover-text-shadow:0 0 5px {{section.settings.hover_color}}; --hover-box-shadow:0 0 5px {{section.settings.hover_color}}"
+                href="{{ routes.account_url }}"
+                title="account link"
+                class="flex justify-center items-center hover:before:scale-110 hover-shadow-before relative w-[31px] h-[31px] text-center leading-[60px] bg-[#333] rounded-[50%] text-[30px] text-[#666] transition duration-[0.5s] before:content-[''] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:rounded-full HoverEffect before:transition-transform before:duration-500 before:scale-90 before:z-[-1]"
+                href="#"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  enable-background="new 0 0 32 32"
+                  height="32px"
+                  width="32px"
+                  viewBox="0 0 24 24"
+                  fill="#fff"
+                >
+                  <g><rect fill="none" height="40" width="40"/></g><g><g><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM7.35 18.5C8.66 17.56 10.26 17 12 17s3.34.56 4.65 1.5c-1.31.94-2.91 1.5-4.65 1.5s-3.34-.56-4.65-1.5zm10.79-1.38C16.45 15.8 14.32 15 12 15s-4.45.8-6.14 2.12C4.7 15.73 4 13.95 4 12c0-4.42 3.58-8 8-8s8 3.58 8 8c0 1.95-.7 3.73-1.86 5.12z"/><path d="M12 6c-1.93 0-3.5 1.57-3.5 3.5S10.07 13 12 13s3.5-1.57 3.5-3.5S13.93 6 12 6zm0 5c-.83 0-1.5-.67-1.5-1.5S11.17 8 12 8s1.5.67 1.5 1.5S12.83 11 12 11z"/></g></g>
+                </svg>
+                <span class="sr-only">
+                  {%- liquid
+                    if customer
+                      echo 'customer.account_fallback' | t
+                    else
+                      echo 'customer.account_fallback' | t
+                    endif
+                  -%}
+                </span>
+              </a>
+            </li>
+            <li class="list-none mx-[15px] my-0">
+              <a
+                href="{{ routes.account_url }}"
+                title="account link"
+                style="--hover-color:{{section.settings.hover_color}}; --hover-text-shadow:0 0 5px {{section.settings.hover_color}}; --hover-box-shadow:0 0 5px {{section.settings.hover_color}}"
+                class="flex justify-center items-center hover:before:scale-110 relative w-[31px] h-[31px] text-center leading-[60px] bg-[#333] rounded-[50%] text-[30px] text-[#666] transition duration-[0.5s] before:content-[''] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:rounded-full before:bg-[#ffee10] before:transition-transform before:duration-500 before:scale-90 before:z-[-1] hover-shadow-before HoverEffect"
+                href="#"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#fff">
+                  <path d="M0 0h24v24H0V0z" fill="none"/><path d="M15.55 13c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.37-.66-.11-1.48-.87-1.48H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 15.37 5.48 17 7 17h12v-2H7l1.1-2h7.45zM6.16 6h12.15l-2.76 5H8.53L6.16 6zM7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+                </svg>
+              </a>
+              <span
+                x-text="cart_count"
+                class="cart__count min-w-[22px] text-sm min-h-[22px] absolute grid place-content-center rounded-full -top-3 -right-1 text-white bg-black"
+              >
+                {{ cart.item_count }}
+              </span>
+            </li>
+          </ul>
+        </div>
+      {%- endif -%}
+    </div>
   </div>
 </header>
 

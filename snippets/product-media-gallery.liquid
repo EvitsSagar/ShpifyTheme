@@ -11,37 +11,6 @@
   {% render 'product-media-gallery' %}
 {% endcomment %}
 
-{%- liquid
-  if section.settings.hide_variants and variant_images.size == product.media.size
-    assign single_media_visible = true
-  endif
-
-  if limit == 1
-    assign single_media_visible = true
-  endif
-
-  assign media_count = product.media.size
-  if section.settings.hide_variants and media_count > 1 and variant_images.size > 0
-    assign media_count = media_count | minus: variant_images.size | plus: 1
-  endif
-
-  if media_count == 1 or single_media_visible
-    assign single_media_visible_mobile = true
-  endif
-
-  if media_count == 0 or single_media_visible_mobile or section.settings.mobile_thumbnails == 'show' or section.settings.mobile_thumbnails == 'columns' and media_count < 3
-    assign hide_mobile_slider = true
-  endif
-
-  if section.settings.media_size == 'large'
-    assign media_width = 0.65
-  elsif section.settings.media_size == 'medium'
-    assign media_width = 0.55
-  elsif section.settings.media_size == 'small'
-    assign media_width = 0.45
-  endif
--%}
-
 <style>
   :root {
     --display: none;
@@ -68,7 +37,7 @@
 
 <div class="">
   <div
-    class="py-16 mx-24 shadow-2xl flex flex-col items-center justify-around p-5 m-2 text-center relative cursor-pointer rounded-lg bg-gradient-to-r from-[#C6E7FF] to-[#D4F6FF]"
+    class="py-16 shadow-2xl flex flex-col items-center justify-around p-5 m-2 text-center relative cursor-pointer rounded-lg bg-gradient-to-r from-[#C6E7FF] to-[#D4F6FF]"
   >
     <div x-data="productViewer()" class="productPageContainer flex justify-center items-center ">
       <div class="productPageImgContainer grid grid-cols-3 gap-4 w-3/4">
@@ -98,10 +67,14 @@
 
 <script>
   const var1 = {{ product.media | json }}; 
+
+  
   const imgArray=[];
-  var1.forEach((element) =>  imgArray.push(`https:${element.src}`));
-
-
+  var1.forEach((element) =>  imgArray.push(`${element.src}`));
+  console.log(var1);
+  {% comment %} {% for image in product.images %}
+    console.log('{{image | image_url}}');
+{% endfor %} {% endcomment %}
   function productViewer() {
     return {
       images:imgArray,

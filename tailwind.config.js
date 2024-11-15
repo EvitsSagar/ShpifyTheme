@@ -12,7 +12,11 @@ module.exports = {
     '/templates/customers/*.json'
   ],
   theme: {
-    extend: {},
+    extend: {
+      maxWidth: {
+        page: 'var(--page-width)',
+      },
+    },
   },
   plugins: [],
 }

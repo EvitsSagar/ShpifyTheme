@@ -1,94 +1,202 @@
-{% comment %}
-  Renders product variant-picker
-
-  Accepts:
-  - product: {Object} product object.
-  - block: {Object} passing the block information.
-  - product_form_id: {String} Id of the product form to which the variant picker is associated.
-  Usage:
-  {% render 'product-variant-picker', product: product, block: block, product_form_id: product_form_id %}
-{% endcomment %}
 {%- unless product.has_only_default_variant -%}
-  <variant-selects
-    id="variant-selects-{{ section.id }}"
-    data-section="{{ section.id }}"
-    {{ block.shopify_attributes }}
-  >
-    {%- for option in product.options_with_values -%}
-      {%- liquid
-        assign swatch_count = option.values | map: 'swatch' | compact | size
-        assign picker_type = block.settings.picker_type
+  {%- for option in product.options_with_values -%}
+    <h1 class="font-sans font-bold">{{ option.name }}</h1>
+    {%- assign name = option.name | downcase -%}
 
-        if swatch_count > 0 and block.settings.swatch_shape != 'none'
-          if block.settings.picker_type == 'dropdown'
-            assign picker_type = 'swatch_dropdown'
-          else
-            assign picker_type = 'swatch'
-          endif
-        endif
-      -%}
-      {%- if picker_type == 'swatch' -%}
-        <fieldset class="js product-form__input product-form__input--swatch">
-          <legend class="form__label">
-            {{ option.name }}:
-            <span data-selected-value>
-              {{- option.selected_value -}}
-            </span>
-          </legend>
-          {% render 'product-variant-options',
-            product: product,
-            option: option,
-            block: block,
-            picker_type: picker_type
-          %}
-        </fieldset>
-      {%- elsif picker_type == 'button' -%}
-        <fieldset class="js product-form__input product-form__input--pill">
-          <legend class="form__label">{{ option.name }}</legend>
-          {% render 'product-variant-options',
-            product: product,
-            option: option,
-            block: block,
-            picker_type: picker_type
-          %}
-        </fieldset>
-      {%- else -%}
-        <div class="product-form__input product-form__input--dropdown">
-          <label class="form__label" for="Option-{{ section.id }}-{{ forloop.index0 }}">
-            {{ option.name }}
-          </label>
-          <div class="select">
-            {%- if picker_type == 'swatch_dropdown' -%}
-              <span
-                data-selected-value
-                class="dropdown-swatch"
-              >
-                {% render 'swatch', swatch: option.selected_value.swatch, shape: block.settings.swatch_shape %}
-              </span>
-            {%- endif -%}
-            <select
-              id="Option-{{ section.id }}-{{ forloop.index0 }}"
-              class="select__select"
-              name="options[{{ option.name | escape }}]"
-              form="{{ product_form_id }}"
+    {%- assign first_value = option.values[0] -%}
+    <div
+      class="text-center w-full flex flex-wrap justify-start"
+      x-data="{ selectedOptions: { '{{ option.name }}': '{{ first_value | escape }}' } }"
+    >
+      {%- for option_value in option.values -%}
+        <label class="cursor-pointer m-2" for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}">
+          <input
+            x-model="selectedOptions['{{ option.name }}']"
+            class="hidden"
+            id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+            type="radio"
+            name="{{ option.name }}-{{ option.position }}"
+            value="{{ option_value | escape }}"
+            {% if option_value.selected %}
+              checked
+            {% endif %}
+            {% unless option_value.available %}
+              class="disabled"
+            {% endunless %}
+            data-product-url="{{ option_value.product_url }}"
+            data-option-value-id="{{ option_value.id }}"
+          >
+          <span
+            class="radio-btn relative inline-block rounded-full border-2 shadow-md w-fit transition-all ease-in-out duration-500 {% if name == 'color' %} h-full py-6 px-8{% else %} px-[6px] py-[3px] min-w-14{% endif %}"
+            :style="
+              {
+               {% comment %} borderColor: selectedOptions['{{ option.name }}'] === '{{ option_value | escape }}' ? '#FFDAE9' : 'transparent' {% endcomment %}
+              borderColor: selectedOptions['{{ option.name }}'] === '{{ option_value | escape }}' ? '{{ schema_setting }}' : 'transparent',
+              {% if name == 'color' %} backgroundColor:'{{ option_value }}'{% endif %}
+              }
+            "
+          >
+            <i
+              style="background-color:{{ schema_setting }}"
+              class="checkmark absolute text-white text-lg top-[-15px] left-1/2 transform -translate-x-1/2 scale-150 rounded-full  transition-all duration-500 pointer-events-none px-2 py-0.5 "
+              :class="{ 'opacity-100 scale-100': selectedOptions['{{ option.name }}'] === '{{ option_value | escape }}', 'opacity-0 scale-150': selectedOptions['{{ option.name }}'] !== '{{ option_value | escape }}'}"
+              >✔</i
             >
-              {% render 'product-variant-options',
-                product: product,
-                option: option,
-                block: block,
-                picker_type: picker_type
-              %}
-            </select>
-            <span class="svg-wrapper">
-              {{- 'icon-caret.svg' | inline_asset_content -}}
-            </span>
-          </div>
-        </div>
-      {%- endif -%}
-    {%- endfor -%}
+            {% if name == 'size' %}
+              {{ option_value }}
+            {% endif %}
 
-    <script type="application/json" data-selected-variant>
-      {{ product.selected_or_first_available_variant | json }}
-    </script>
-  </variant-selects>
+            {% comment %}
+              <div class="hobbies-icon">
+                <img
+                  src="https://img.freepik.com/free-vector/hand-drawn-twerk-illustration_23-2149447957.jpg?size=626&ext=jpg"
+                  class="w-36 mx-auto mb-4"
+                >
+                <h3 class="text-gray-600 font-light uppercase tracking-wide text-lg">Music</h3>
+              </div>
+            {% endcomment %}
+          </span>
+        </label>
+      {%- endfor -%}
+    </div>
+  {%- endfor -%}
 {%- endunless -%}
+
+{% comment %}
+  class="{ 'border-blue-200': selectedOptions['{{ option.name }}'] === '{{ option_value | escape }}', 'border-transparent': selectedOptions['{{ option.name }}'] !== '{{ option_value | escape }}' }"
+  style="{% if name == 'color' %} background-color:{{ option_value }}; {% endif %}"
+{% endcomment %}
+
+{% comment %}
+  {% if name == 'size' %}
+    {%- assign first_value = option.values[0] -%}
+    <div
+      class="text-center w-full flex flex-wrap justify-center"
+      x-data="{ selectedOptions: { '{{ option.name }}': '{{ first_value | escape }}' } }"
+    >
+      {%- for option_value in option.values -%}
+        <label class="cursor-pointer m-2" for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}">
+          <input
+            x-model="selectedOptions['{{ option.name }}']"
+            class="hidden"
+            id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+            type="radio"
+            name="{{ option.name }}-{{ option.position }}"
+            value="{{ option_value | escape }}"
+            {% if option_value.selected %}
+              checked
+            {% endif %}
+            {% unless option_value.available %}
+              class="disabled"
+            {% endunless %}
+            data-product-url="{{ option_value.product_url }}"
+            data-option-value-id="{{ option_value.id }}"
+          >
+          <span
+            class="radio-btn relative inline-block w-56 h-60 rounded-lg border-2 shadow-md p-4 transition-all ease-in-out duration-500"
+            :class="{ 'border-pink-200': selectedOptions['{{ option.name }}'] === '{{ option_value | escape }}', 'border-transparent': selectedOptions['{{ option.name }}'] !== '{{ option_value | escape }}' }"
+          >
+            <i
+              class="checkmark absolute text-white bg-pink-200 text-lg top-[-15px] left-1/2 transform -translate-x-1/2 scale-150 rounded-full p-1 transition-all duration-500 pointer-events-none"
+              :class="{ 'opacity-100 scale-100': selectedOptions['{{ option.name }}'] === '{{ option_value | escape }}', 'opacity-0 scale-150': selectedOptions['{{ option.name }}'] !== '{{ option_value | escape }}' }"
+              >✔</i
+            >
+            {% comment %}
+              <div class="hobbies-icon">
+                <img
+                  src="https://img.freepik.com/free-vector/hand-drawn-twerk-illustration_23-2149447957.jpg?size=626&ext=jpg"
+                  class="w-36 mx-auto mb-4"
+                >
+                <h3 class="text-gray-600 font-light uppercase tracking-wide text-lg">Music</h3>
+              </div>
+            {% endcomment %}
+          </span>
+        </label>
+      {%- endfor -%}
+    </div>
+  {% endif %}
+{% endcomment %}
+
+{% comment %}
+  {%- unless product.has_only_default_variant -%}
+    <div>
+      {%- for option in product.options_with_values -%}
+        {%- liquid
+          assign swatch_count = option.values | map: 'swatch' | compact | size
+          assign picker_type = block.settings.picker_type
+
+          if swatch_count > 0 and block.settings.swatch_shape != 'none'
+            if block.settings.picker_type == 'dropdown'
+              assign picker_type = 'swatch_dropdown'
+            else
+              assign picker_type = 'swatch'
+            endif
+          endif
+        -%}
+        {%- if picker_type == 'swatch' -%}
+          <fieldset class="js product-form__input product-form__input--swatch">
+            <legend class="form__label">
+              {{ option.name }}:
+              <span data-selected-value>
+                {{- option.selected_value -}}
+              </span>
+            </legend>
+            {% render 'product-variant-options',
+              product: product,
+              option: option,
+              block: block,
+              picker_type: picker_type
+            %}
+          </fieldset>
+
+        {%- elsif picker_type == 'button' -%}
+          <fieldset class="js product-form__input product-form__input--pill">
+            <legend class="form__label">{{ option.name }}</legend>
+            {% render 'product-variant-options',
+              product: product,
+              option: option,
+              block: block,
+              picker_type: picker_type
+            %}
+          </fieldset>
+        {%- else -%}
+          <div class="product-form__input product-form__input--dropdown">
+            <label class="form__label" for="Option-{{ section.id }}-{{ forloop.index0 }}">
+              {{ option.name }}
+            </label>
+            <div class="select">
+              {%- if picker_type == 'swatch_dropdown' -%}
+                <span
+                  data-selected-value
+                  class="dropdown-swatch"
+                >
+                  {% render 'swatch', swatch: option.selected_value.swatch, shape: block.settings.swatch_shape %}
+                </span>
+              {%- endif -%}
+              <select
+                id="Option-{{ section.id }}-{{ forloop.index0 }}"
+                class="select__select"
+                name="options[{{ option.name | escape }}]"
+                form="{{ product_form_id }}"
+              >
+                {% render 'product-variant-options',
+                  product: product,
+                  option: option,
+                  block: block,
+                  picker_type: picker_type
+                %}
+              </select>
+              <span class="svg-wrapper">
+                {{- 'icon-caret.svg' | inline_asset_content -}}
+              </span>
+            </div>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+
+      <script type="application/json" data-selected-variant>
+        {{ product.selected_or_first_available_variant | json }}
+      </script>
+    </div>
+  {%- endunless -%}
+{% endcomment %}
