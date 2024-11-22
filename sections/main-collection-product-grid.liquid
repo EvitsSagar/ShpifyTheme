@@ -39,10 +39,8 @@
                     style="--animation-order: {{ forloop.index }};"
                   {% endif %}
                 >
-                  {% if section.settings.card_style == "vertical" %}
-                   
-                    {%
-                      render 'card-product',+
+                  {% if section.settings.card_style == 'vertical' %}
+                    {% render 'card-product',
                       card_product: product,
                       media_aspect_ratio: section.settings.image_ratio,
                       image_shape: section.settings.image_shape,
@@ -51,23 +49,23 @@
                       show_rating: section.settings.show_rating,
                       quick_add: section.settings.quick_add,
                       section_id: section.id,
-                      description_lines:section.settings.description_lines
+                      description_lines: section.settings.description_lines
                     %}
-                  
-                  {% elsif section.settings.card_style=="horizontal" %}
-                  {% render 'horizontal-card-product',
-                    card_product: product,
-                    media_aspect_ratio: section.settings.image_ratio,
-                    image_shape: section.settings.image_shape,
-                    show_secondary_image: section.settings.show_secondary_image,
-                    show_vendor: section.settings.show_vendor,
-                    show_rating: section.settings.show_rating,
-                    quick_add: section.settings.quick_add,
-                    section_id: section.id,
-                    description_lines: section.settings.description_lines
-                  %}
+
+                  {% elsif section.settings.card_style == 'horizontal' %}
+                    {% render 'horizontal-card-product',
+                      card_product: product,
+                      media_aspect_ratio: section.settings.image_ratio,
+                      image_shape: section.settings.image_shape,
+                      show_secondary_image: section.settings.show_secondary_image,
+                      show_vendor: section.settings.show_vendor,
+                      show_rating: section.settings.show_rating,
+                      quick_add: section.settings.quick_add,
+                      section_id: section.id,
+                      description_lines: section.settings.description_lines
+                    %}
+                  {% endif %}
                 </li>
-                {% endif %}
               {%- endfor -%}
             </ul>
 

@@ -166,12 +166,6 @@
                       {{ product.description }}
                     </p>
                   </div>
-
-                  {% comment %}
-                    <div class="" {{ block.shopify_attributes }}>
-                      {{ product.description }}
-                    </div>
-                  {% endcomment %}
                 {%- endif -%}
               {%- when 'sku' -%}
                 <p
@@ -209,22 +203,6 @@
                   class="space-y-6"
                   {{ block.shopify_attributes }}
                 >
-                  {% comment %}
-                    {%- assign cart_qty = cart
-                      | item_count_for_variant: product.selected_or_first_available_variant.id
-                    -%}
-                    <label class="" for="Quantity-{{ section.id }}">
-                      {{ 'products.product.quantity.label' | t }}
-                      <span class="">
-                        {%- render 'loading-spinner' -%}
-                        <span
-                          >(
-                          {{- 'products.product.quantity.in_cart_html' | t: quantity: cart_qty -}}
-                          )</span
-                        >
-                      </span>
-                    </label>
-                  {% endcomment %}
                   <div
                     class="grid grid-cols-[20%_60%_20%]"
                     x-data="
@@ -233,51 +211,17 @@
                          minus(value) {
                           this.qty = parseInt(this.qty);
                           (this.qty == 1) ? this.qty = 1 : this.qty -= value;
+                          document.querySelector('#quantityHandler').value = this.qty
                         },
                         plus(value) {
                           this.qty = parseInt(this.qty);
                           this.qty += value;
+                          document.querySelector('#quantityHandler').value = this.qty
                         }
                       }
                     "
+                    x-init="$watch('qty', value =>  $dispatch('quantity-changed', { quantity: value }))"
                   >
-                    {% comment %}
-                      <quantity-input class="" data-url="{{ product.url }}" data-section="{{ section.id }}">
-                        <button class="" name="minus" type="button">
-                          <span class="">
-                            {{- 'products.product.quantity.decrease' | t: product: product.title | escape -}}
-                          </span>
-                          <span class="">
-                            {{- 'icon-minus.svg' | inline_asset_content -}}
-                          </span>
-                        </button>
-                        <input
-                          class=""
-                          type="number"
-                          name="quantity"
-                          id="Quantity-{{ section.id }}"
-                          data-cart-quantity="{{ cart_qty }}"
-                          data-min="{{ product.selected_or_first_available_variant.quantity_rule.min }}"
-                          min="{{ product.selected_or_first_available_variant.quantity_rule.min }}"
-                          {% if product.selected_or_first_available_variant.quantity_rule.max != null %}
-                            data-max="{{ product.selected_or_first_available_variant.quantity_rule.max }}"
-                            max="{{ product.selected_or_first_available_variant.quantity_rule.max }}"
-                          {% endif %}
-                          step="{{ product.selected_or_first_available_variant.quantity_rule.increment }}"
-                          value="{{ product.selected_or_first_available_variant.quantity_rule.min }}"
-                          form="{{ product_form_id }}"
-                        >
-                        <button class="" name="plus" type="button">
-                          <span class="">
-                            {{- 'products.product.quantity.increase' | t: product: product.title | escape -}}
-                          </span>
-                          <span class="">
-                            {{- 'icon-plus.svg' | inline_asset_content -}}
-                          </span>
-                        </button>
-                      </quantity-input>
-                    {% endcomment %}
-
                     <button
                       @click="minus(1)"
                       class="flex justify-center items-center border rounded-l-lg border-slate-300 py-2 px-4 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-slate-800 hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
@@ -298,11 +242,11 @@
                       value="1"
                       min="1"
                       max="10"
+                      @input="document.querySelector('#quantityHandler').value = qty"
                       type="number"
                       name="quantity"
                       id="quantity"
-                      class="bg-gray-50 text-2xl font-semibold text-center text border-y border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      placeholder=""
+                      class="product-qty__input bg-gray-50 text-2xl font-semibold text-center text border-y border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       required
                     >
                     <button
@@ -343,205 +287,203 @@
                   product_form_id: product_form_id,
                   schema_setting: section.settings.pick_selection_color
                 %}
-                {% comment %}
-                  {%- when 'buy_buttons' -%}
-                    {%- render 'buy-buttons',
-                      block: block,
-                      product: product,
-                      product_form_id: product_form_id,
-                      section_id: section.id,
-                      show_pickup_availability: true
-                    -%}
-                  {%- when 'rating' -%}
-                    {%- if product.metafields.reviews.rating.value != blank -%}
-                      <div class="rating-wrapper">
-                        {% liquid
-                          assign rating_decimal = 0
-                          assign decimal = product.metafields.reviews.rating.value.rating | modulo: 1
-                          if decimal >= 0.3 and decimal <= 0.7
-                            assign rating_decimal = 0.5
-                          elsif decimal > 0.7
-                            assign rating_decimal = 1
-                          endif
-                        %}
-                        <div
-                          class="rating"
-                          role="img"
-                          aria-label="{{ 'accessibility.star_reviews_info' | t: rating_value: product.metafields.reviews.rating.value, rating_max: product.metafields.reviews.rating.value.scale_max }}"
-                        >
-                          <span
-                            aria-hidden="true"
-                            class="rating-star"
-                            style="--rating: {{ product.metafields.reviews.rating.value.rating | floor }}; --rating-max: {{ product.metafields.reviews.rating.value.scale_max }}; --rating-decimal: {{ rating_decimal }};"
-                          ></span>
-                        </div>
-                        <p class="rating-text caption">
-                          <span aria-hidden="true">
-                            {{- product.metafields.reviews.rating.value }} /
-                            {{ product.metafields.reviews.rating.value.scale_max -}}
-                          </span>
-                        </p>
-                        <p class="rating-count caption">
-                          <span aria-hidden="true">({{ product.metafields.reviews.rating_count }})</span>
-                          <span class="visually-hidden">
-                            {{- product.metafields.reviews.rating_count }}
-                            {{ 'accessibility.total_reviews' | t -}}
-                          </span>
-                        </p>
-                      </div>
-                    {%- endif -%}
-                  {%- when 'complementary' -%}
-                    <product-recommendations
-                      class="complementary-products quick-add-hidden{% if block.settings.make_collapsible_row %} is-accordion{% endif %}{% if block.settings.enable_quick_add %} complementary-products-contains-quick-add{% endif %}"
-                      data-url="{{ routes.product_recommendations_url }}?limit={{ block.settings.product_list_limit }}&intent=complementary"
-                      data-section-id="{{ section.id }}"
-                      data-product-id="{{ product.id }}"
+
+              {%- when 'buy_buttons' -%}
+                {%- render 'buy-buttons',
+                  block: block,
+                  product: product,
+                  product_form_id: product_form_id,
+                  section_id: section.id,
+                  show_pickup_availability: true
+                -%}
+              {%- when 'rating' -%}
+                {%- if product.metafields.reviews.rating.value != blank -%}
+                  <div class="rating-wrapper">
+                    {% liquid
+                      assign rating_decimal = 0
+                      assign decimal = product.metafields.reviews.rating.value.rating | modulo: 1
+                      if decimal >= 0.3 and decimal <= 0.7
+                        assign rating_decimal = 0.5
+                      elsif decimal > 0.7
+                        assign rating_decimal = 1
+                      endif
+                    %}
+                    <div
+                      class="rating"
+                      role="img"
+                      aria-label="{{ 'accessibility.star_reviews_info' | t: rating_value: product.metafields.reviews.rating.value, rating_max: product.metafields.reviews.rating.value.scale_max }}"
                     >
-                      {%- if recommendations.performed and recommendations.products_count > 0 -%}
-                        <aside
-                          aria-label="{{ 'accessibility.complementary_products' | t }}"
-                          {{ block.shopify_attributes -}}
-                          {% if block.settings.make_collapsible_row %}
-                            class="product__accordion accordion"
-                          {% endif %}
-                        >
-                          <div class="complementary-products__container">
-                            {%- if block.settings.make_collapsible_row -%}
-                              <details id="Details-{{ block.id }}-{{ section.id }}" open>
-                                <summary>
-                            {%- endif %}
-                            <div class="summary__title">
-                              {%- if block.settings.make_collapsible_row -%}
-                                {% render 'icon-accordion', icon: block.settings.icon %}
-                                <h2 class="h4 accordion__title">{{ block.settings.block_heading }}</h2>
-                              {%- else -%}
-                                <h2 class="h3 accordion__title">{{ block.settings.block_heading }}</h2>
-                              {%- endif -%}
-                            </div>
-                            {%- if block.settings.make_collapsible_row -%}
-                              {{- 'icon-caret.svg' | inline_asset_content -}}
-                              </summary>
-                            {%- endif -%}
-                            <slideshow-component class="slider-mobile-gutter">
-                              {%- assign number_of_slides = recommendations.products_count
-                                | plus: 0.0
-                                | divided_by: block.settings.products_per_page
-                                | ceil
-                              -%}
+                      <span
+                        aria-hidden="true"
+                        class="rating-star"
+                        style="--rating: {{ product.metafields.reviews.rating.value.rating | floor }}; --rating-max: {{ product.metafields.reviews.rating.value.scale_max }}; --rating-decimal: {{ rating_decimal }};"
+                      ></span>
+                    </div>
+                    <p class="rating-text caption">
+                      <span aria-hidden="true">
+                        {{- product.metafields.reviews.rating.value }} /
+                        {{ product.metafields.reviews.rating.value.scale_max -}}
+                      </span>
+                    </p>
+                    <p class="rating-count caption">
+                      <span aria-hidden="true">({{ product.metafields.reviews.rating_count }})</span>
+                      <span class="visually-hidden">
+                        {{- product.metafields.reviews.rating_count }}
+                        {{ 'accessibility.total_reviews' | t -}}
+                      </span>
+                    </p>
+                  </div>
+                {%- endif -%}
+              {%- when 'complementary' -%}
+                <product-recommendations
+                  class="complementary-products quick-add-hidden{% if block.settings.make_collapsible_row %} is-accordion{% endif %}{% if block.settings.enable_quick_add %} complementary-products-contains-quick-add{% endif %}"
+                  data-url="{{ routes.product_recommendations_url }}?limit={{ block.settings.product_list_limit }}&intent=complementary"
+                  data-section-id="{{ section.id }}"
+                  data-product-id="{{ product.id }}"
+                >
+                  {%- if recommendations.performed and recommendations.products_count > 0 -%}
+                    <aside
+                      aria-label="{{ 'accessibility.complementary_products' | t }}"
+                      {{ block.shopify_attributes -}}
+                      {% if block.settings.make_collapsible_row %}
+                        class="product__accordion accordion"
+                      {% endif %}
+                    >
+                      <div class="complementary-products__container">
+                        {%- if block.settings.make_collapsible_row -%}
+                          <details id="Details-{{ block.id }}-{{ section.id }}" open>
+                            <summary>
+                        {%- endif %}
+                        <div class="summary__title">
+                          {%- if block.settings.make_collapsible_row -%}
+                            {% render 'icon-accordion', icon: block.settings.icon %}
+                            <h2 class="h4 accordion__title">{{ block.settings.block_heading }}</h2>
+                          {%- else -%}
+                            <h2 class="h3 accordion__title">{{ block.settings.block_heading }}</h2>
+                          {%- endif -%}
+                        </div>
+                        {%- if block.settings.make_collapsible_row -%}
+                          {{- 'icon-caret.svg' | inline_asset_content -}}
+                          </summary>
+                        {%- endif -%}
+                        <slideshow-component class="slider-mobile-gutter">
+                          {%- assign number_of_slides = recommendations.products_count
+                            | plus: 0.0
+                            | divided_by: block.settings.products_per_page
+                            | ceil
+                          -%}
+                          <div
+                            id="Slider-{{ block.id }}"
+                            class="contains-card contains-card--product complementary-slider grid grid--1-col slider slider--everywhere"
+                            role="list"
+                            {% if number_of_slides > 1 %}
+                              aria-label="{{ 'general.slider.name' | t }}"
+                            {% endif %}
+                          >
+                            {% assign skip_card_product_styles = false %}
+                            {%- for i in (1..number_of_slides) -%}
                               <div
-                                id="Slider-{{ block.id }}"
-                                class="contains-card contains-card--product complementary-slider grid grid--1-col slider slider--everywhere"
-                                role="list"
+                                id="Slide-{{ block.id }}-{{ forloop.index }}"
+                                class="complementary-slide complementary-slide--{{ settings.card_style }} grid__item slider__slide slideshow__slide"
+                                tabindex="-1"
+                                role="group"
                                 {% if number_of_slides > 1 %}
-                                  aria-label="{{ 'general.slider.name' | t }}"
+                                  aria-roledescription="{{ 'sections.slideshow.slide' | t }}"
+                                  aria-label="{{ forloop.index }} {{ 'general.slider.of' | t }} {{ forloop.length }}"
                                 {% endif %}
                               >
-                                {% assign skip_card_product_styles = false %}
-                                {%- for i in (1..number_of_slides) -%}
-                                  <div
-                                    id="Slide-{{ block.id }}-{{ forloop.index }}"
-                                    class="complementary-slide complementary-slide--{{ settings.card_style }} grid__item slider__slide slideshow__slide"
-                                    tabindex="-1"
-                                    role="group"
-                                    {% if number_of_slides > 1 %}
-                                      aria-roledescription="{{ 'sections.slideshow.slide' | t }}"
-                                      aria-label="{{ forloop.index }} {{ 'general.slider.of' | t }} {{ forloop.length }}"
-                                    {% endif %}
-                                  >
-                                    <ul class="list-unstyled" role="list">
-                                      {%- for product in recommendations.products
-                                        limit: block.settings.products_per_page
-                                        offset: continue
-                                      -%}
-                                        <li>
-                                          {%- if block.settings.enable_quick_add -%}
-                                            {% assign quick_add = 'standard' %}
-                                          {%- else -%}
-                                            {% assign quick_add = 'none' %}
-                                          {%- endif -%}
-                                          {% render 'card-product',
-                                            card_product: product,
-                                            media_aspect_ratio: block.settings.image_ratio,
-                                            show_secondary_image: false,
-                                            lazy_load: false,
-                                            skip_styles: skip_card_product_styles,
-                                            quick_add: quick_add,
-                                            section_id: section.id,
-                                            horizontal_class: true,
-                                            horizontal_quick_add: true
-                                          %}
-                                        </li>
-                                        {%- assign skip_card_product_styles = true -%}
-                                      {%- endfor -%}
-                                    </ul>
-                                  </div>
-                                {%- endfor -%}
+                                <ul class="list-unstyled" role="list">
+                                  {%- for product in recommendations.products
+                                    limit: block.settings.products_per_page
+                                    offset: continue
+                                  -%}
+                                    <li>
+                                      {%- if block.settings.enable_quick_add -%}
+                                        {% assign quick_add = 'standard' %}
+                                      {%- else -%}
+                                        {% assign quick_add = 'none' %}
+                                      {%- endif -%}
+                                      {% render 'card-product',
+                                        card_product: product,
+                                        media_aspect_ratio: block.settings.image_ratio,
+                                        show_secondary_image: false,
+                                        lazy_load: false,
+                                        skip_styles: skip_card_product_styles,
+                                        quick_add: quick_add,
+                                        section_id: section.id,
+                                        horizontal_class: true,
+                                        horizontal_quick_add: true
+                                      %}
+                                    </li>
+                                    {%- assign skip_card_product_styles = true -%}
+                                  {%- endfor -%}
+                                </ul>
                               </div>
-                              {%- if number_of_slides > 1 -%}
-                                <div class="slider-buttons">
-                                  <button
-                                    type="button"
-                                    class="slider-button slider-button--prev"
-                                    name="previous"
-                                    aria-label="{{ 'general.slider.previous_slide' | t }}"
-                                  >
-                                    <span class="svg-wrapper">
-                                      {{- 'icon-caret.svg' | inline_asset_content -}}
-                                    </span>
-                                  </button>
-                                  <div class="slider-counter slider-counter--{{ block.settings.pagination_style }}{% if block.settings.pagination_style == 'counter' or block.settings.pagination_style == 'numbers' %} caption{% endif %}">
-                                    {%- if block.settings.pagination_style == 'counter' -%}
-                                      <span class="slider-counter--current">1</span>
-                                      <span aria-hidden="true"> / </span>
-                                      <span class="visually-hidden">{{ 'general.slider.of' | t }}</span>
-                                      <span class="slider-counter--total">{{ number_of_slides }}</span>
-                                    {%- else -%}
-                                      <div class="slideshow__control-wrapper">
-                                        {%- for i in (1..number_of_slides) -%}
-                                          <button
-                                            class="slider-counter__link slider-counter__link--{{ block.settings.pagination_style }} link"
-                                            aria-label="{{ 'sections.slideshow.load_slide' | t }} {{ forloop.index }} {{ 'general.slider.of' | t }} {{ forloop.length }}"
-                                            aria-controls="Slider-{{ block.id }}"
-                                          >
-                                            {%- if block.settings.pagination_style == 'numbers' -%}
-                                              {{ forloop.index -}}
-                                            {%- else -%}
-                                              <span class="dot"></span>
-                                            {%- endif -%}
-                                          </button>
-                                        {%- endfor -%}
-                                      </div>
-                                    {%- endif -%}
-                                  </div>
-                                  <button
-                                    type="button"
-                                    class="slider-button slider-button--next"
-                                    name="next"
-                                    aria-label="{{ 'general.slider.next_slide' | t }}"
-                                  >
-                                    <span class="svg-wrapper">
-                                      {{- 'icon-caret.svg' | inline_asset_content -}}
-                                    </span>
-                                  </button>
-                                </div>
-                              {%- endif -%}
-                            </slideshow-component>
-                            {%- if block.settings.make_collapsible_row -%}
-                              </details>
-                            {%- endif -%}
+                            {%- endfor -%}
                           </div>
-                        </aside>
-                      {%- endif -%}
-                      {{ 'component-card.css' | asset_url | stylesheet_tag }}
-                      {{ 'component-complementary-products.css' | asset_url | stylesheet_tag }}
-                      {%- if block.settings.enable_quick_add -%}
-                        {{ 'quick-add.css' | asset_url | stylesheet_tag }}
-                        <script src="{{ 'quick-add.js' | asset_url }}" defer="defer"></script>
-                      {%- endif -%}
-                    </product-recommendations>
-                  {%- when 'icon-with-text' -%}
-                {% endcomment %}
-
+                          {%- if number_of_slides > 1 -%}
+                            <div class="slider-buttons">
+                              <button
+                                type="button"
+                                class="slider-button slider-button--prev"
+                                name="previous"
+                                aria-label="{{ 'general.slider.previous_slide' | t }}"
+                              >
+                                <span class="svg-wrapper">
+                                  {{- 'icon-caret.svg' | inline_asset_content -}}
+                                </span>
+                              </button>
+                              <div class="slider-counter slider-counter--{{ block.settings.pagination_style }}{% if block.settings.pagination_style == 'counter' or block.settings.pagination_style == 'numbers' %} caption{% endif %}">
+                                {%- if block.settings.pagination_style == 'counter' -%}
+                                  <span class="slider-counter--current">1</span>
+                                  <span aria-hidden="true"> / </span>
+                                  <span class="visually-hidden">{{ 'general.slider.of' | t }}</span>
+                                  <span class="slider-counter--total">{{ number_of_slides }}</span>
+                                {%- else -%}
+                                  <div class="slideshow__control-wrapper">
+                                    {%- for i in (1..number_of_slides) -%}
+                                      <button
+                                        class="slider-counter__link slider-counter__link--{{ block.settings.pagination_style }} link"
+                                        aria-label="{{ 'sections.slideshow.load_slide' | t }} {{ forloop.index }} {{ 'general.slider.of' | t }} {{ forloop.length }}"
+                                        aria-controls="Slider-{{ block.id }}"
+                                      >
+                                        {%- if block.settings.pagination_style == 'numbers' -%}
+                                          {{ forloop.index -}}
+                                        {%- else -%}
+                                          <span class="dot"></span>
+                                        {%- endif -%}
+                                      </button>
+                                    {%- endfor -%}
+                                  </div>
+                                {%- endif -%}
+                              </div>
+                              <button
+                                type="button"
+                                class="slider-button slider-button--next"
+                                name="next"
+                                aria-label="{{ 'general.slider.next_slide' | t }}"
+                              >
+                                <span class="svg-wrapper">
+                                  {{- 'icon-caret.svg' | inline_asset_content -}}
+                                </span>
+                              </button>
+                            </div>
+                          {%- endif -%}
+                        </slideshow-component>
+                        {%- if block.settings.make_collapsible_row -%}
+                          </details>
+                        {%- endif -%}
+                      </div>
+                    </aside>
+                  {%- endif -%}
+                  {{ 'component-card.css' | asset_url | stylesheet_tag }}
+                  {{ 'component-complementary-products.css' | asset_url | stylesheet_tag }}
+                  {%- if block.settings.enable_quick_add -%}
+                    {{ 'quick-add.css' | asset_url | stylesheet_tag }}
+                    <script src="{{ 'quick-add.js' | asset_url }}" defer="defer"></script>
+                  {%- endif -%}
+                </product-recommendations>
+              {%- when 'icon-with-text' -%}
                 {% render 'icon-with-text', block: block %}
             {%- endcase -%}
           {%- endfor -%}

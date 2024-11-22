@@ -1,0 +1,103 @@
+<script>
+  function shippingCalculator() {
+    return {
+      selectedCountry: '',
+      selectedProvince: '',
+      provinces: [],
+      zip: '',
+      shippingRates: [],
+
+      updateProvinces() {
+        const country = document.querySelector(`#shipping-country option[value="${this.selectedCountry}"]`);
+        const provincesData = country ? JSON.parse(country.dataset.provinces || '[]') : [];
+        this.provinces = provincesData;
+        this.selectedProvince = '';
+      },
+
+      calculateShipping() {
+        if (!this.selectedCountry || !this.zip) {
+          alert('Please select a country and enter a zip code.');
+          return;
+        }
+
+        fetch(
+          `/cart/shipping_rates.json?shipping_address[zip]=${this.zip}&shipping_address[country]=${this.selectedCountry}&shipping_address[province]=${this.selectedProvince}`
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            this.shippingRates = data.shipping_rates || [];
+          })
+          .catch((error) => {
+            console.error('Error fetching shipping rates:', error);
+            alert('An error occurred while calculating shipping rates.');
+          });
+      },
+    };
+  }
+</script>
+
+<div id="shipping-calculator" x-data="shippingCalculator()">
+  <h3 class="text-lg font-semibold mb-4">Estimate Shipping</h3>
+  <p class="mb-4 text-gray-600">Enter your destination to get a shipping estimate.</p>
+
+  <form class="space-y-4">
+    <div>
+      <label for="shipping-country" class="block text-sm font-medium text-gray-700">Country</label>
+      <select
+        id="shipping-country"
+        x-model="selectedCountry"
+        @change="updateProvinces"
+        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+      >
+        <option value="" disabled>Select a country</option>
+        {%- for country in shop.countries -%}
+          <option value="{{ country.iso_code }}" :data-provinces="{{ country.provinces | map: 'name' | json }}">
+            {{ country.name }}
+          </option>
+        {%- endfor -%}
+      </select>
+    </div>
+
+    <div>
+      <label for="shipping-province" class="block text-sm font-medium text-gray-700">Province/State</label>
+      <select
+        id="shipping-province"
+        x-model="selectedProvince"
+        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+      >
+        <template x-for="province in provinces" :key="province">
+          <option x-text="province" :value="province"></option>
+        </template>
+        <option x-show="provinces.length === 0" disabled>No provinces available</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="shipping-zip" class="block text-sm font-medium text-gray-700">Zip/Postal Code</label>
+      <input
+        id="shipping-zip"
+        x-model="zip"
+        type="text"
+        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+        placeholder="Enter zip or postal code"
+      >
+    </div>
+
+    <button
+      type="button"
+      @click="calculateShipping"
+      class="w-full py-2 px-4 bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+    >
+      Calculate
+    </button>
+  </form>
+
+  <div id="shipping-rates-result" class="mt-4" x-show="shippingRates.length">
+    <h4 class="text-md font-semibold mb-2">Shipping Rates</h4>
+    <ul class="space-y-2">
+      <template x-for="rate in shippingRates" :key="rate.name">
+        <li x-text="`${rate.name}: ${rate.price}`" class="text-gray-600"></li>
+      </template>
+    </ul>
+  </div>
+</div>
