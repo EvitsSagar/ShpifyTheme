@@ -9,6 +9,7 @@
     data-zoom-on-hover
   {% endif %}
 >
+  <script src="{{ 'jquery.min.js' | asset_url }}" rel="preload" async as="script"></script>
   <script src="{{ 'product-info.js' | asset_url }}" defer="defer"></script>
   <script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
   {% comment %}
@@ -497,32 +498,34 @@
       </div>
     </div>
 
-    {% render 'product-media-modal', variant_images: variant_images %}
+    {% comment %} {% render 'product-media-modal', variant_images: variant_images %} {% endcomment %}
 
     {% assign popups = section.blocks | where: 'type', 'popup' %}
     {%- for block in popups -%}
-      <modal-dialog id="PopupModal-{{ block.id }}" class="product-popup-modal" {{ block.shopify_attributes }}>
-        <div
-          role="dialog"
-          aria-label="{{ block.settings.text }}"
-          aria-modal="true"
-          class="product-popup-modal__content"
-          tabindex="-1"
-        >
-          <button
-            id="ModalClose-{{ block.id }}"
-            type="button"
-            class="product-popup-modal__toggle"
-            aria-label="{{ 'accessibility.close' | t }}"
+      {% comment %}
+        <modal-dialog id="PopupModal-{{ block.id }}" class="product-popup-modal" {{ block.shopify_attributes }}>
+          <div
+            role="dialog"
+            aria-label="{{ block.settings.text }}"
+            aria-modal="true"
+            class="product-popup-modal__content"
+            tabindex="-1"
           >
-            {{- 'icon-close.svg' | inline_asset_content -}}
-          </button>
-          <div class="product-popup-modal__content-info">
-            <h1 class="h2">{{ block.settings.page.title | escape }}</h1>
-            {{ block.settings.page.content }}
+            <button
+              id="ModalClose-{{ block.id }}"
+              type="button"
+              class="product-popup-modal__toggle"
+              aria-label="{{ 'accessibility.close' | t }}"
+            >
+              {{- 'icon-close.svg' | inline_asset_content -}}
+            </button>
+            <div class="product-popup-modal__content-info">
+              <h1 class="h2">{{ block.settings.page.title | escape }}</h1>
+              {{ block.settings.page.content }}
+            </div>
           </div>
-        </div>
-      </modal-dialog>
+        </modal-dialog>
+      {% endcomment %}
     {%- endfor -%}
 
     {% comment %}

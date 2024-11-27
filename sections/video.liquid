@@ -1,20 +1,3 @@
-{{ 'video-section.css' | asset_url | stylesheet_tag }}
-{{ 'component-deferred-media.css' | asset_url | stylesheet_tag }}
-
-{%- style -%}
-  .section-{{ section.id }}-padding {
-    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
-    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
-  }
-
-  @media screen and (min-width: 750px) {
-    .section-{{ section.id }}-padding {
-      padding-top: {{ section.settings.padding_top }}px;
-      padding-bottom: {{ section.settings.padding_bottom }}px;
-    }
-  }
-{%- endstyle -%}
-
 {%- liquid
   assign video_id = section.settings.video.id | default: section.settings.video_url.id
   assign video_alt = section.settings.video.alt | default: section.settings.description
@@ -38,87 +21,109 @@
   {%- endif %}
 {%- endcapture -%}
 
-<div class="color-{{ section.settings.color_scheme }} gradient">
-  <div class="video-section isolate{% unless section.settings.full_width %} page-width{% endunless %} section-{{ section.id }}-padding">
-    <div
-      {% if section.settings.full_width %}
-        class="page-width"
-      {% endif %}
-    >
-      {%- unless section.settings.heading == blank -%}
-        <div class="title-wrapper title-wrapper--no-top-margin{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
-          <h2 class="title inline-richtext {{ section.settings.heading_size }}">{{ section.settings.heading }}</h2>
-        </div>
-      {%- endunless -%}
-    </div>
-    <deferred-media
-      class="video-section__media deferred-media gradient global-media-settings{% if section.settings.full_width %} global-media-settings--full-width{% endif %}{% if fix_ratio %} media-fit-cover{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
-      data-media-id="{{ video_id }}"
-      {% if poster != null %}
-        style="--ratio-percent: {{ 1 | divided_by: poster.aspect_ratio | times: 100 }}%;"
-      {% endif %}
-    >
-      <button
-        id="Deferred-Poster-Modal-{{ video_id }}"
-        class="video-section__poster media deferred-media__poster media--landscape"
-        type="button"
-        aria-label="{{ alt }}"
+{% comment %}
+  <div class="color-{{ section.settings.color_scheme }} gradient">
+    <div class="video-section isolate{% unless section.settings.full_width %} page-width{% endunless %} section-{{ section.id }}-padding">
+      <div
+        {% if section.settings.full_width %}
+          class="page-width"
+        {% endif %}
       >
-        {%- if poster != null -%}
-          {{
-            poster
-            | image_url: width: 3840
-            | image_tag: sizes: sizes, widths: '375, 750, 1100, 1500, 1780, 2000, 3000, 3840', alt: alt
-          }}
-        {%- else -%}
-          {{ 'hero-apparel-3' | placeholder_svg_tag: 'placeholder-svg placeholder' }}
-        {%- endif -%}
-        <span class="deferred-media__poster-button motion-reduce">
-          <span class="svg-wrapper">
-            {{- 'icon-play.svg' | inline_asset_content -}}
-          </span>
-        </span>
-      </button>
-      <template>
-        {%- if section.settings.video == null and section.settings.video_url != null -%}
-          {%- liquid
-            assign loop = ''
-            if section.settings.enable_video_looping
-              assign loop = '&loop=1&playlist=' | append: video_id
-            endif
-          -%}
-          {%- if section.settings.video_url.type == 'youtube' -%}
-            <iframe
-              src="https://www.youtube.com/embed/{{ video_id }}?enablejsapi=1&autoplay=1{{ loop }}"
-              class="js-youtube"
-              allow="autoplay; encrypted-media"
-              allowfullscreen
-              title="{{ section.settings.description | escape }}"
-            ></iframe>
+        {%- unless section.settings.heading == blank -%}
+          <div class="title-wrapper title-wrapper--no-top-margin{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+            <h2 class="title inline-richtext {{ section.settings.heading_size }}">{{ section.settings.heading }}</h2>
+          </div>
+        {%- endunless -%}
+      </div>
+      <deferred-media
+        class="video-section__media deferred-media gradient global-media-settings{% if section.settings.full_width %} global-media-settings--full-width{% endif %}{% if fix_ratio %} media-fit-cover{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+        data-media-id="{{ video_id }}"
+        {% if poster != null %}
+          style="--ratio-percent: {{ 1 | divided_by: poster.aspect_ratio | times: 100 }}%;"
+        {% endif %}
+      >
+        <button
+          id="Deferred-Poster-Modal-{{ video_id }}"
+          class="video-section__poster media deferred-media__poster media--landscape"
+          type="button"
+          aria-label="{{ alt }}"
+        >
+          {%- if poster != null -%}
+            {{
+              poster
+              | image_url: width: 3840
+              | image_tag: sizes: sizes, widths: '375, 750, 1100, 1500, 1780, 2000, 3000, 3840', alt: alt
+            }}
           {%- else -%}
-            <iframe
-              src="https://player.vimeo.com/video/{{ video_id }}?autoplay=1{{ loop }}"
-              class="js-vimeo"
-              allow="autoplay; encrypted-media"
-              allowfullscreen
-              title="{{ section.settings.description | escape }}"
-            ></iframe>
+            {{ 'hero-apparel-3' | placeholder_svg_tag: 'placeholder-svg placeholder' }}
           {%- endif -%}
-        {%- else -%}
-          {{
-            section.settings.video
-            | video_tag:
-              image_size: '1100x',
-              autoplay: true,
-              loop: section.settings.enable_video_looping,
-              controls: true,
-              muted: false
-          }}
-        {%- endif -%}
-      </template>
-    </deferred-media>
+          <span class="deferred-media__poster-button motion-reduce">
+            <span class="svg-wrapper">
+              {{- 'icon-play.svg' | inline_asset_content -}}
+            </span>
+          </span>
+        </button>
+        {% comment %}
+          <template>
+            {%- if section.settings.video == null and section.settings.video_url != null -%}
+              {%- liquid
+                assign loop = ''
+                if section.settings.enable_video_looping
+                  assign loop = '&loop=1&playlist=' | append: video_id
+                endif
+              -%}
+              {%- if section.settings.video_url.type == 'youtube' -%}
+                <iframe
+                  src="https://www.youtube.com/embed/{{ video_id }}?enablejsapi=1&autoplay=1{{ loop }}"
+                  class="js-youtube"
+                  allow="autoplay; encrypted-media"
+                  allowfullscreen
+                  title="{{ section.settings.description | escape }}"
+                ></iframe>
+              {%- else -%}
+                <iframe
+                  src="https://player.vimeo.com/video/{{ video_id }}?autoplay=1{{ loop }}"
+                  class="js-vimeo"
+                  allow="autoplay; encrypted-media"
+                  allowfullscreen
+                  title="{{ section.settings.description | escape }}"
+                ></iframe>
+              {%- endif -%}
+            {%- else -%}
+              {{
+                section.settings.video
+                | video_tag:
+                  image_size: '1100x',
+                  autoplay: true,
+                  loop: section.settings.enable_video_looping,
+                  controls: true,
+                  muted: false
+              }}
+            {%- endif -%}
+          </template>
+        {% endcomment %}
+      </deferred-media>
+    </div>
   </div>
-</div>
+{% endcomment %}
+
+<section class="relative h-screen flex flex-col items-center justify-center text-center text-white">
+  <div class="absolute inset-0 w-full h-full overflow-hidden">
+    <div class="absolute inset-0 bg-black bg-opacity-60 z-[2]"></div>
+    <video
+      class="absolute inset-0 min-w-full min-h-full object-cover"
+      src="https://cdn.shopify.com/videos/c/o/v/47e0aa14659c48f4b54258e7a5ce9f6a.webm"
+      type="video/mp4"
+      autoplay
+      muted
+      loop
+    ></video>
+  </div>
+  <div class="relative z-[3] space-y-2">
+    <h1 class="font-light text-6xl">Store Tagline</h1>
+    <h3 class="font-light text-3xl">Store moto</h3>
+  </div>
+</section>
 
 {% schema %}
 {

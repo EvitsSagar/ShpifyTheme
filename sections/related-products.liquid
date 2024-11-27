@@ -1,24 +1,70 @@
-{{ 'component-card.css' | asset_url | stylesheet_tag }}
-{{ 'component-price.css' | asset_url | stylesheet_tag }}
-{{ 'section-related-products.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'owl.carousel.js' | asset_url }}" defer as="script"></script>
 
-{% if section.settings.image_shape == 'blob' %}
-  {{ 'mask-blobs.css' | asset_url | stylesheet_tag }}
-{%- endif -%}
+{{ 'owl.carousel.min.css' | asset_url | stylesheet_tag }}
+{{ 'owl.theme.default.min.css' | asset_url | stylesheet_tag }}
 
-{%- style -%}
-  .section-{{ section.id }}-padding {
-    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
-    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
-  }
-
-  @media screen and (min-width: 750px) {
-    .section-{{ section.id }}-padding {
-      padding-top: {{ section.settings.padding_top }}px;
-      padding-bottom: {{ section.settings.padding_bottom }}px;
-    }
-  }
-{%- endstyle -%}
+<div class="max-w-page mx-auto">
+  <div class="owl-carousel">
+    {{ recommendations | json }}
+    {% for recommendation in recommendations.products %}
+      <div class="">
+        {% render 'card-product',
+          card_product: recommendation,
+          media_aspect_ratio: section.settings.image_ratio,
+          image_shape: section.settings.image_shape,
+          show_secondary_image: section.settings.show_secondary_image,
+          show_vendor: section.settings.show_vendor,
+          show_rating: section.settings.show_rating,
+          quick_add: section.settings.quick_add,
+          section_id: section.id,
+          description_lines: section.settings.description_lines
+        %}
+      </div>
+    {% endfor %}
+  </div>
+  <script>
+    window.addEventListener('load', (event) => {
+      var owl = $('.owl-carousel');
+      owl.owlCarousel({
+        margin: 10,
+        loop: true,
+        responsive: {
+          0: {
+            items: 1,
+          },
+          600: {
+            items: 2,
+          },
+          1000: {
+            items: 3,
+          },
+        },
+      });
+    });
+  </script>
+  {% comment %}
+    <script>
+      $(document).ready(function () {
+        var owl = $('.owl-carousel');
+        owl.owlCarousel({
+          margin: 10,
+          loop: true,
+          responsive: {
+            0: {
+              items: 1,
+            },
+            600: {
+              items: 2,
+            },
+            1000: {
+              items: 3,
+            },
+          },
+        });
+      });
+    </script>
+  {% endcomment %}
+</div>
 
 <div class="color-{{ section.settings.color_scheme }} gradient">
   <product-recommendations
