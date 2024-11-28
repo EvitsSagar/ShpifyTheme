@@ -3423,13 +3423,6 @@ __webpack_require__.r(__webpack_exports__);
 
 window.Alpine = alpinejs__WEBPACK_IMPORTED_MODULE_0__["default"];
 alpinejs__WEBPACK_IMPORTED_MODULE_0__["default"].start();
-document.addEventListener("DOMContentLoaded", function () {
-  var loader = document.getElementById("page-loader");
-  loader.classList.remove("hidden");
-  window.onload = function () {
-    loader.classList.add("hidden");
-  };
-});
 
 /***/ }),
 
