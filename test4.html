@@ -4,39 +4,40 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <style>
-    .owl-carousel .item {
-    height: 10rem;
-    background: #4DC7A0;
-    padding: 1rem;
-}
-  </style>
-
-  <script>
-    $('.owl-carousel').owlCarousel({
-    loop:true,
-    margin:10,
-    nav:true,
-    responsive:{
-        0:{
-            items:1
-        },
-        600:{
-            items:3
-        },
-        1000:{
-            items:5
-        }
-    }
-})
-  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body>
-  <div class="owl-carousel owl-theme">
-    <div class="item"><h4>1</h4></div>
-    <div class="item"><h4>2</h4></div>
-    <div class="item"><h4>3</h4></div>
-    <div class="item"><h4>4</h4></div>
-</div>
+  <div class="bg-gray-200" x-data="{ showBar: false }">
+  
+    <nav
+         class="w-full py-4 text-center fixed text-xs font-semibold"
+         :class="{ 'bg-white shadow transition duration-100' : showBar }"
+         @scroll.window="showBar = (window.pageYOffset > 20) ? true : false"
+         >
+      MENU
+    </nav>
+    
+    <div class="pt-20 w-full px-8 lg:w-1/2 mx-auto">
+      <span class="inline-flex px-2 py-0 rounded mb-8 text-xs uppercase bg-indigo-200 text-indigo-600 font-semibold">Scroll down</span>
+      
+      <p class="mb-8 text-sm text-gray-600">
+        Made with TailwindCSS & Alpine.js.
+      </p>
+      
+      <p>
+        The wheel is come full circle.  Harp not on that.  I will no longer endure it, though yet I know no wise remedy how to avoid it.  A fool, a fool! I met a fool i' th' forest, A motley fool.  Invest me in my motley; give me leave To speak my mind, and I will through and through Cleanse the foul body of th' infected world, If they will patiently receive my medicine. Then a soldier, Full of strange oaths, and bearded like the pard, Jealous in honour, sudden and quick in quarrel, Seeking the bubble reputation Even in the cannon's mouth. 
+      <br><br>
+      Young man, have you challeng'd Charles the wrestler? If he fail of that, He will have other means to cut you off; I overheard him and his practices.   Speak you so gently? Pardon me, I pray you; I thought that all things had been savage here, And therefore put I on the countenance Of stern commandment.  Last scene of all, That ends this strange eventful history, Is second childishness and mere oblivion; Sans teeth, sans eyes, sans taste, sans every thing. Now in respect it is in the fields, it pleaseth me well; but in respect it is not in the court, it is tedious. 
+      <br><br>
+      Uneasy lies the head that wears a crown.  By the pricking of my thumbs, At one fell swoop  For my part, he keeps me rustically at home, or, to speak more properly, stays me here at home unkept; for call you that keeping for a gentleman of my birth that differs not from the stalling of an ox? His horses are bred better; for, besides that they are fair with their feeding, they are taught their manage, and to that end riders dearly hir'd; but I, his brother, gain nothing under him but growth; for the which his animals on his dunghills are as much bound to him as I.  To-day my Lord of Amiens and myself Did steal behind him as he lay along Under an oak whose antique root peeps out Upon the brook that brawls along this wood!  To the which place a poor sequest'red stag, That from the hunter's aim had ta'en a hurt, Did come to languish; and, indeed, my lord, The wretched animal heav'd forth such groans That their discharge did stretch his leathern coat Almost to bursting; and the big round tears Cours'd one another down his innocent nose In piteous chase; and thus the hairy fool, Much marked of the melancholy Jaques, Stood on th' extremest verge of the swift brook, Augmenting it with tears. If he fail of that, He will have other means to cut you off; I overheard him and his practices.    A fool, a fool! I met a fool i' th' forest, A motley fool.  But whate'er you are That in this desert inaccessible, Under the shade of melancholy boughs, Lose and neglect the creeping hours of time; If ever you have look'd on better days, If ever been where bells have knoll'd to church, If ever sat at any good man's feast, If ever from your eyelids wip'd a tear, And know what 'tis to pity and be pitied, Let gentleness my strong enforcement be; In the which hope I blush, and hide my sword. At first the infant, Mewling and puking in the nurse's arms; Then the whining school-boy, with his satchel And shining morning face, creeping like snail Unwillingly to school. 
+      <br><br>
+      Neither a borrower or a lender be.  That's meat and drink to me, now.  This ring was mine, I gave it his first wife. Come, sing; and you that will not, hold your tongues. Last scene of all, That ends this strange eventful history, Is second childishness and mere oblivion; Sans teeth, sans eyes, sans taste, sans every thing.
+      <br><br>
+      The game is up.  He has eaten me out of house and home.  This woman's an easy glove, my lord; she goes of and on at pleasure. Let me love him for that; and do you love him because I do. Look, here comes the Duke. No, Corin, being old, thou canst not guess, Though in thy youth thou wast as true a lover As ever sigh'd upon a midnight pillow.   Last scene of all, That ends this strange eventful history, Is second childishness and mere oblivion; Sans teeth, sans eyes, sans taste, sans every thing. But look to it: Find out thy brother wheresoe'er he is; Seek him with candle; bring him dead or living Within this twelvemonth, or turn thou no more To seek a living in our territory.   Peace, you dull fool! I found them on a tree. I'll graff it with you, and then I shall graff it with a medlar. Then it will be the earliest fruit i' th' country; for you'll be rotten ere you be half ripe, and that's the right virtue of the medlar.
+      </p>
+    </div>
+  </div>
+  
 </body>
 </html>

@@ -3,6 +3,36 @@
 @tailwind utilities;
 
 
+@keyframes motion {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(3px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  @keyframes roadAnimation {
+    0% {
+      transform: translateX(0px);
+    }
+    100% {
+      transform: translateX(-350px);
+    }
+  }
+
+  .truck-motion {
+    animation: motion 1s linear infinite;
+  }
+
+  .road-motion {
+    animation: roadAnimation 1.4s linear infinite;
+  }
+
+
 
 .header{
     display: grid;

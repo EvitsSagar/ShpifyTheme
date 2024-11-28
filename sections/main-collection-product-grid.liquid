@@ -33,7 +33,7 @@
             >
               {%- for product in collection.products -%}
                 <li
-                  class="animate-zoomInUp transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 grid__item{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in {% endif %} border border-gray-200 rounded-lg shadow hover:bg-gray-100"
+                  class="animate-fade-up2 hover:scale-110 transition-transform grid__item{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in {% endif %} border border-gray-200 rounded-lg shadow hover:bg-gray-100"
                   {% if settings.animations_reveal_on_scroll %}
                     data-cascade
                     style="--animation-order: {{ forloop.index }};"

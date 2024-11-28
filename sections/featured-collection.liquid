@@ -26,9 +26,9 @@
     id="collection-{{ section.id }}"
     data-id="{{ section.id }}"
   >
-    <div class="collection__title title-wrapper title-wrapper--no-top-margin page-width{% if show_mobile_slider %} title-wrapper--self-padded-tablet-down{% endif %}{% if show_desktop_slider %} collection__title--desktop-slider{% endif %}">
+    <div class="py-8">
       {%- if section.settings.title != blank -%}
-        <h2 class="title inline-richtext {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+        <h2 class="text-4xl font-semibold">
           {{ section.settings.title }}
         </h2>
       {%- endif -%}
@@ -58,7 +58,7 @@
         {%- for product in section.settings.collection.products limit: section.settings.products_to_show -%}
           <li
             id="Slide-{{ section.id }}-{{ forloop.index }}"
-            class="animate-zoomInUp transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 grid__item{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in {% endif %} border border-gray-200 rounded-lg shadow hover:bg-gray-100"
+            class="hover:z-[5] animate-fade-up2 hover:scale-110 transition-transform grid__item{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in {% endif %} border border-gray-200 rounded-lg shadow hover:bg-gray-100"
             {% if settings.animations_reveal_on_scroll %}
               data-cascade
               style="--animation-order: {{ forloop.index }};"

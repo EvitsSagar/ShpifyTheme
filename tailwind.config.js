@@ -17,6 +17,10 @@ module.exports = {
         page: 'var(--page-width)',
       },
       keyframes: {
+        "fadeUp": {
+          '0%': { opacity: '0', transform: 'translateY(20px) scale(1)' },
+          '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+        },
         "fade-in": {
             "0%": {
                 opacity: 0
@@ -1124,6 +1128,7 @@ module.exports = {
         },
     },
     animation: {
+        'fade-up2': 'fadeUp var(--tw-animate-duration, 1s) var(--tw-animate-easing, ease)',
         fadein: 'fade-in 1s ease-in-out 0.25s 1',
         fadeout: 'fade-out 1s ease-out 0.25s 1',
         fadeindown: 'fade-in-down 1s ease-in 0.25s 1',
@@ -1218,6 +1223,8 @@ module.exports = {
     },
     },
   },
-  plugins: [],
+  plugins: [
+    require('tailwindcss-animated')
+  ],
 }
 
