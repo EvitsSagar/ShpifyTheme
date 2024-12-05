@@ -206,7 +206,7 @@ function onMutate(mutations) {
     deferredMutations = deferredMutations.concat(mutations);
     return;
   }
-  let addedNodes = /* @__PURE__ */ new Set();
+  let addedNodes = [];
   let removedNodes = /* @__PURE__ */ new Set();
   let addedAttributes = /* @__PURE__ */ new Map();
   let removedAttributes = /* @__PURE__ */ new Map();
@@ -214,8 +214,24 @@ function onMutate(mutations) {
     if (mutations[i].target._x_ignoreMutationObserver)
       continue;
     if (mutations[i].type === "childList") {
-      mutations[i].addedNodes.forEach((node) => node.nodeType === 1 && addedNodes.add(node));
-      mutations[i].removedNodes.forEach((node) => node.nodeType === 1 && removedNodes.add(node));
+      mutations[i].removedNodes.forEach((node) => {
+        if (node.nodeType !== 1)
+          return;
+        if (!node._x_marker)
+          return;
+        removedNodes.add(node);
+      });
+      mutations[i].addedNodes.forEach((node) => {
+        if (node.nodeType !== 1)
+          return;
+        if (removedNodes.has(node)) {
+          removedNodes.delete(node);
+          return;
+        }
+        if (node._x_marker)
+          return;
+        addedNodes.push(node);
+      });
     }
     if (mutations[i].type === "attributes") {
       let el = mutations[i].target;
@@ -248,29 +264,15 @@ function onMutate(mutations) {
     onAttributeAddeds.forEach((i) => i(el, attrs));
   });
   for (let node of removedNodes) {
-    if (addedNodes.has(node))
+    if (addedNodes.some((i) => i.contains(node)))
       continue;
     onElRemoveds.forEach((i) => i(node));
   }
-  addedNodes.forEach((node) => {
-    node._x_ignoreSelf = true;
-    node._x_ignore = true;
-  });
   for (let node of addedNodes) {
-    if (removedNodes.has(node))
-      continue;
     if (!node.isConnected)
       continue;
-    delete node._x_ignoreSelf;
-    delete node._x_ignore;
     onElAddeds.forEach((i) => i(node));
-    node._x_ignore = true;
-    node._x_ignoreSelf = true;
   }
-  addedNodes.forEach((node) => {
-    delete node._x_ignoreSelf;
-    delete node._x_ignore;
-  });
   addedNodes = null;
   removedNodes = null;
   addedAttributes = null;
@@ -814,13 +816,20 @@ var initInterceptors2 = [];
 function interceptInit(callback) {
   initInterceptors2.push(callback);
 }
+var markerDispenser = 1;
 function initTree(el, walker = walk, intercept = () => {
 }) {
+  if (findClosest(el, (i) => i._x_ignore))
+    return;
   deferHandlingDirectives(() => {
     walker(el, (el2, skip) => {
+      if (el2._x_marker)
+        return;
       intercept(el2, skip);
       initInterceptors2.forEach((i) => i(el2, skip));
       directives(el2, el2.attributes).forEach((handle) => handle());
+      if (!el2._x_ignore)
+        el2._x_marker = markerDispenser++;
       el2._x_ignore && skip();
     });
   });
@@ -829,6 +838,7 @@ function destroyTree(root, walker = walk) {
   walker(root, (el) => {
     cleanupElement(el);
     cleanupAttributes(el);
+    delete el._x_marker;
   });
 }
 function warnAboutMissingPlugins() {
@@ -1660,7 +1670,7 @@ var Alpine = {
   get raw() {
     return raw;
   },
-  version: "3.14.3",
+  version: "3.14.6",
   flushAndStopDeferringMutations,
   dontAutoEvaluateFunctions,
   disableEffectScheduling,

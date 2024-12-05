@@ -1,4 +1,257 @@
-<div class="flex-1 flex flex-col {% if drawer!=true %} max-w-page mx-auto shadow-lg {% else %}  {% endif %}">
+<script>
+
+  window.globalValue = null;
+
+  function changeGlobalValue(newValue,currencyIso) {
+    window.globalValue = newValue;
+      {% comment %} let currency_convert=cartItem('', '', '', newValue, currencyIso).formatCurrency(
+      stotal,
+      cartItem('', '', '', newValue, currencyIso).updateLocale(),
+      currencyIso
+    );
+    console.log(currency_convert,"ppp")  {% endcomment %}
+    if (window.alpineData) {
+      window.alpineData.globalValue = newValue;
+    }
+  }
+
+  function getsubtotal(subTotal, currencyIso) {
+    const stotal = isNaN(subTotal) ? 0 : subTotal / 100;
+    const cart = cartItem('', '', '', stotal, currencyIso);
+    return cart.formatCurrency(stotal, cart.updateLocale(), currencyIso);
+  }
+
+  function cartItem(initialQuantity, LinePrice, itemId, subTotal, currencyIso) {
+    changeGlobalValue(subTotal,currencyIso)
+    return {
+      quantity: initialQuantity,
+      Totalprice: LinePrice / 100,
+      isVisible: true,
+      currency: currencyIso,
+      locale: 'en-IN',
+
+      currencyLocaleMap: {
+        USD: 'en-US',
+        GBP: 'en-GB',
+        EUR: 'de-DE',
+        INR: 'en-IN',
+        JPY: 'ja-JP',
+      },
+
+      decreaseQuantity() {
+        if (this.quantity > 1) {
+          this.updateCart(this.quantity - 1);
+        }
+      },
+
+      increaseQuantity() {
+        this.updateCart(this.quantity + 1);
+      },
+
+      async updateCart(newQuantity) {
+        try {
+          const response = await fetch('/cart/change.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: itemId, quantity: newQuantity }),
+          });
+
+          if (response.ok) {
+            if (newQuantity !== 0) {
+              await this.getUpdatedCartItems();
+            } else {
+              const fetchCart = await fetch('/cart.js', {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+              });
+              if (fetchCart.ok) {
+                const data = await fetchCart.json();
+                {% comment %} document.getElementById('SubTotalAmt').textContent = getsubtotal(data.items_subtotal_price, currencyIso); {% endcomment %}
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error updating cart:', error);
+        }
+      },
+
+      removeItem() {
+        this.updateCart(0)
+          .then(() => {
+            this.isVisible = false;
+          })
+          .catch((error) => console.error('Error removing item:', error));
+      },
+
+      async getUpdatedCartItems() {
+        try {
+          const response = await fetch('/cart.js', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            const foundItem = data.items.find((item) => item.id === parseInt(itemId));
+            if (foundItem) {
+              this.quantity = foundItem.quantity;
+              this.Totalprice = foundItem.line_price / 100;
+              this.currency = data.currency;
+              {% comment %} changeGlobalValue(formatCurrency(data.items_subtotal_price,updateLocale(),currencyIso)) {% endcomment %}
+              {% comment %} document.getElementById('SubTotalAmt').textContent = getsubtotal(data.items_subtotal_price, currencyIso); {% endcomment %}
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching cart items:', error);
+        }
+      },
+
+      formatCurrency(amount, locale, currency) {
+        let formatted = new Intl.NumberFormat(locale, {
+          style: 'currency',
+          currency: currency,
+        }).format(amount || 0);
+
+        if (currency === 'INR') {
+          formatted = formatted.replace('₹', 'Rs.');
+        }
+        return formatted;
+      },
+
+      updateLocale() {
+        this.locale = this.currencyLocaleMap[this.currency] || 'en-US';
+        return this.locale;
+      },
+    };
+  }
+</script>
+
+
+<div class="flex-1 flex flex-col {% if drawer != true %} max-w-page mx-auto shadow-lg {% endif %}">
+  <div class="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
+    <div class="mt-8">
+      <div class="flow-root">
+        <ul role="list" class="-my-6 divide-y divide-gray-200">
+          {% for item in cart.items %}
+            <li
+              x-data="cartItem({{ item.quantity }},'{{ item.line_price }}','{{ item.id }}','{{ cart.total_price }}','{{ cart.currency.iso_code }}')"
+              x-show="isVisible"
+              class="flex py-6"
+            >
+              {% comment %} <div x-text="price"></div> {% endcomment %}
+
+              <div
+                class="{% if drawer != true %} size-48 {% else %} size-32 {% endif %} shrink-0 overflow-hidden rounded-md border border-gray-200 p-2"
+              >
+                <img
+                  src="{{ item.image | image_url: width: 400 }}"
+                  alt="{{ item.product.title }}"
+                  class="size-full object-contain"
+                  height=""
+                  width=""
+                >
+              </div>
+
+              <!-- Product Details -->
+              <div class="ml-4 flex flex-1 flex-col">
+                <div>
+                  <div class="flex justify-between text-xl font-medium text-gray-900">
+                    <h3>
+                      <a
+                        class="{% if drawer != true %} text-4xl {% endif %}"
+                        href="{{ item.url }}"
+                      >
+                        {{ item.title }}
+                      </a>
+                    </h3>
+                    <p class="ml-4 {% if drawer != true %} text-4xl {% else %} text-xl {% endif %}">
+                      <span>
+                        {{ item.price | money_with_currency }}
+                      </span>
+                      <span class="text-black">&#x2716;</span>
+                      <span x-text="quantity"></span>:
+                      <span x-text="formatCurrency(Totalprice, locale, currency)"></span>
+                      {% comment %} <span x-text="Totalprice"></span> {% endcomment %}
+                      {% comment %} {{ item.line_price | money_with_currency }} {% endcomment %}
+                    </p>
+                  </div>
+                  <p class="mt-1 text-base text-gray-500">{{ item.product_type }}</p>
+                </div>
+
+                <!-- Quantity Controls -->
+                <div class="flex flex-1 items-end justify-between text-sm">
+                  <div class="w-5/12">
+                    <p class="text-gray-500 {% if drawer != true %} text-4xl {% else %} text-xl {% endif %}">Qty</p>
+                    <div class="flex mt-2">
+                      <button
+                        type="button"
+                        title="Decrease quantity"
+                        @click="decreaseQuantity"
+                        class="border rounded-l-lg px-4 py-2 bg-gray-200 hover:bg-gray-300"
+                      >
+                        &minus;
+                      </button>
+                      <input
+                        type="number"
+                        x-model="quantity"
+                        min="1"
+                        class="w-12 text-center border-t border-b"
+                      >
+                      <button
+                        type="button"
+                        title="Increase quantity"
+                        @click="increaseQuantity"
+                        class="border rounded-r-lg px-4 py-2 bg-gray-200 hover:bg-gray-300"
+                      >
+                        &plus;
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="flex">
+                    <button
+                      @click.prevent="removeItem()"
+                      type="button"
+                      class="font-medium text-red-600 hover:underline"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cart Summary -->
+  <div class="border-t border-gray-200 px-4 py-6 sm:px-6">
+    <div
+      x-data
+      class="flex justify-between text-xl font-medium text-gray-900"
+    >
+      <p>Subtotal</p>
+      <p id="SubTotalAmt" x-text="getsubtotal('{{ cart.total_price }}','{{ cart.currency.iso_code }}')"></p>
+      <div x-data="{ globalValue: window.globalValue }" x-init="window.alpineData = $data; $watch('globalValue', value => window.globalValue = value)">
+        <p x-text="globalValue"></p>
+        {% comment %} <button @click="changeGlobalValue('Changed Value from Function in Head')">Change Value (Function in Head)</button> {% endcomment %}
+      </div>
+    </div>
+    <p class="mt-0.5 text-gray-500">Shipping, taxes, and discounts calculated at checkout.</p>
+    <div class="mt-6">
+      <a
+        href="/checkout"
+        class="w-full flex items-center justify-center rounded-md bg-indigo-600 px-6 py-3 text-xl font-medium text-white hover:bg-indigo-700"
+      >
+        Checkout
+      </a>
+    </div>
+  </div>
+</div>
+
+{% comment %} <div class="flex-1 flex flex-col {% if drawer!=true %} max-w-page mx-auto shadow-lg {% else %}  {% endif %}">
   <div class="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
     <div class="mt-8">
       <div class="flow-root">
@@ -98,4 +351,4 @@
       </div>
     </div>
   </div>
-</div>
+</div> {% endcomment %}

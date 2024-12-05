@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Global Variable with Alpine.js</title>
+
+  <script>
+    // Define a global variable in the head
+    window.globalValue = "Initial Value from Head Script";
+
+    // Function to change the global variable's value
+    function changeGlobalValue(newValue) {
+      window.globalValue = newValue;
+      // Trigger Alpine.js to update its reactive state
+      if (window.alpineData) {
+        window.alpineData.globalValue = newValue;
+      }
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</head>
+<body>
+  <div x-data="{ globalValue: window.globalValue }" x-init="window.alpineData = $data; $watch('globalValue', value => window.globalValue = value)">
+    <p x-text="globalValue"></p>
+    <button @click="globalValue = 'Changed Value from Alpine Button'">Change Value (Alpine)</button>
+    <button @click="changeGlobalValue('Changed Value from Function in Head')">Change Value (Function in Head)</button>
+  </div>
+
+</body>
+</html>
