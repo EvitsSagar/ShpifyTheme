@@ -1,134 +1,5 @@
-<script>
-
-  window.globalValue = null;
-
-  function changeGlobalValue(newValue,currencyIso) {
-    window.globalValue = newValue;
-      {% comment %} let currency_convert=cartItem('', '', '', newValue, currencyIso).formatCurrency(
-      stotal,
-      cartItem('', '', '', newValue, currencyIso).updateLocale(),
-      currencyIso
-    );
-    console.log(currency_convert,"ppp")  {% endcomment %}
-    if (window.alpineData) {
-      window.alpineData.globalValue = newValue;
-    }
-  }
-
-  function getsubtotal(subTotal, currencyIso) {
-    const stotal = isNaN(subTotal) ? 0 : subTotal / 100;
-    const cart = cartItem('', '', '', stotal, currencyIso);
-    return cart.formatCurrency(stotal, cart.updateLocale(), currencyIso);
-  }
-
-  function cartItem(initialQuantity, LinePrice, itemId, subTotal, currencyIso) {
-    changeGlobalValue(subTotal,currencyIso)
-    return {
-      quantity: initialQuantity,
-      Totalprice: LinePrice / 100,
-      isVisible: true,
-      currency: currencyIso,
-      locale: 'en-IN',
-
-      currencyLocaleMap: {
-        USD: 'en-US',
-        GBP: 'en-GB',
-        EUR: 'de-DE',
-        INR: 'en-IN',
-        JPY: 'ja-JP',
-      },
-
-      decreaseQuantity() {
-        if (this.quantity > 1) {
-          this.updateCart(this.quantity - 1);
-        }
-      },
-
-      increaseQuantity() {
-        this.updateCart(this.quantity + 1);
-      },
-
-      async updateCart(newQuantity) {
-        try {
-          const response = await fetch('/cart/change.js', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: itemId, quantity: newQuantity }),
-          });
-
-          if (response.ok) {
-            if (newQuantity !== 0) {
-              await this.getUpdatedCartItems();
-            } else {
-              const fetchCart = await fetch('/cart.js', {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-              });
-              if (fetchCart.ok) {
-                const data = await fetchCart.json();
-                {% comment %} document.getElementById('SubTotalAmt').textContent = getsubtotal(data.items_subtotal_price, currencyIso); {% endcomment %}
-              }
-            }
-          }
-        } catch (error) {
-          console.error('Error updating cart:', error);
-        }
-      },
-
-      removeItem() {
-        this.updateCart(0)
-          .then(() => {
-            this.isVisible = false;
-          })
-          .catch((error) => console.error('Error removing item:', error));
-      },
-
-      async getUpdatedCartItems() {
-        try {
-          const response = await fetch('/cart.js', {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            const foundItem = data.items.find((item) => item.id === parseInt(itemId));
-            if (foundItem) {
-              this.quantity = foundItem.quantity;
-              this.Totalprice = foundItem.line_price / 100;
-              this.currency = data.currency;
-              {% comment %} changeGlobalValue(formatCurrency(data.items_subtotal_price,updateLocale(),currencyIso)) {% endcomment %}
-              {% comment %} document.getElementById('SubTotalAmt').textContent = getsubtotal(data.items_subtotal_price, currencyIso); {% endcomment %}
-            }
-          }
-        } catch (error) {
-          console.error('Error fetching cart items:', error);
-        }
-      },
-
-      formatCurrency(amount, locale, currency) {
-        let formatted = new Intl.NumberFormat(locale, {
-          style: 'currency',
-          currency: currency,
-        }).format(amount || 0);
-
-        if (currency === 'INR') {
-          formatted = formatted.replace('₹', 'Rs.');
-        }
-        return formatted;
-      },
-
-      updateLocale() {
-        this.locale = this.currencyLocaleMap[this.currency] || 'en-US';
-        return this.locale;
-      },
-    };
-  }
-</script>
-
-
 <div class="flex-1 flex flex-col {% if drawer != true %} max-w-page mx-auto shadow-lg {% endif %}">
-  <div class="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
+  <div class="flex-1 overflow-y-auto px-4 py-6 sm:px-6 border-b border-gray-200">
     <div class="mt-8">
       <div class="flow-root">
         <ul role="list" class="-my-6 divide-y divide-gray-200">
@@ -138,11 +9,14 @@
               x-show="isVisible"
               class="flex py-6"
             >
-              {% comment %} <div x-text="price"></div> {% endcomment %}
-
               <div
                 class="{% if drawer != true %} size-48 {% else %} size-32 {% endif %} shrink-0 overflow-hidden rounded-md border border-gray-200 p-2"
               >
+                <div
+                  x-show="loading"
+                >
+                  {%- render 'TopLoader' -%}
+                </div>
                 <img
                   src="{{ item.image | image_url: width: 400 }}"
                   alt="{{ item.product.title }}"
@@ -164,46 +38,61 @@
                         {{ item.title }}
                       </a>
                     </h3>
-                    <p class="ml-4 {% if drawer != true %} text-4xl {% else %} text-xl {% endif %}">
+                    <p class="ml-4 {% if drawer != true %} text-4xl {% else %} text-xl {% endif %} space-x-3 flex items-center">
                       <span>
                         {{ item.price | money_with_currency }}
                       </span>
-                      <span class="text-black">&#x2716;</span>
-                      <span x-text="quantity"></span>:
-                      <span x-text="formatCurrency(Totalprice, locale, currency)"></span>
-                      {% comment %} <span x-text="Totalprice"></span> {% endcomment %}
-                      {% comment %} {{ item.line_price | money_with_currency }} {% endcomment %}
+                      <span class="">*</span>
+                      <span x-text="quantity"></span>
+                      <span
+                        class="border-double border-2 border-black px-6 py-1 rounded-md"
+                        x-text="formatCurrency(Totalprice,currency)"
+                      ></span>
                     </p>
                   </div>
                   <p class="mt-1 text-base text-gray-500">{{ item.product_type }}</p>
                 </div>
-
-                <!-- Quantity Controls -->
                 <div class="flex flex-1 items-end justify-between text-sm">
-                  <div class="w-5/12">
+                  <div class="w-1/5">
                     <p class="text-gray-500 {% if drawer != true %} text-4xl {% else %} text-xl {% endif %}">Qty</p>
                     <div class="flex mt-2">
                       <button
                         type="button"
                         title="Decrease quantity"
                         @click="decreaseQuantity"
-                        class="border rounded-l-lg px-4 py-2 bg-gray-200 hover:bg-gray-300"
+                        class="flex justify-center items-center border rounded-l-lg border-slate-300 py-2 px-4 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-slate-800 hover:border-slate-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                       >
-                        &minus;
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          height="24px"
+                          viewBox="0 -960 960 960"
+                          width="24px"
+                          fill="currentColor"
+                        >
+                          <path d="M200-440v-80h560v80H200Z"/>
+                        </svg>
                       </button>
                       <input
                         type="number"
                         x-model="quantity"
                         min="1"
-                        class="w-12 text-center border-t border-b"
+                        class=" bg-gray-50 text-2xl font-semibold text-center text border-y border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       >
                       <button
                         type="button"
                         title="Increase quantity"
                         @click="increaseQuantity"
-                        class="border rounded-r-lg px-4 py-2 bg-gray-200 hover:bg-gray-300"
+                        class="flex justify-center items-center border rounded-r-lg border-slate-300 py-2 px-4 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-slate-800 hover:border-slate-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                       >
-                        &plus;
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          height="24px"
+                          viewBox="0 -960 960 960"
+                          width="24px"
+                          fill="currentColor"
+                        >
+                          <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/>
+                        </svg>
                       </button>
                     </div>
                   </div>
@@ -212,90 +101,7 @@
                     <button
                       @click.prevent="removeItem()"
                       type="button"
-                      class="font-medium text-red-600 hover:underline"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- Cart Summary -->
-  <div class="border-t border-gray-200 px-4 py-6 sm:px-6">
-    <div
-      x-data
-      class="flex justify-between text-xl font-medium text-gray-900"
-    >
-      <p>Subtotal</p>
-      <p id="SubTotalAmt" x-text="getsubtotal('{{ cart.total_price }}','{{ cart.currency.iso_code }}')"></p>
-      <div x-data="{ globalValue: window.globalValue }" x-init="window.alpineData = $data; $watch('globalValue', value => window.globalValue = value)">
-        <p x-text="globalValue"></p>
-        {% comment %} <button @click="changeGlobalValue('Changed Value from Function in Head')">Change Value (Function in Head)</button> {% endcomment %}
-      </div>
-    </div>
-    <p class="mt-0.5 text-gray-500">Shipping, taxes, and discounts calculated at checkout.</p>
-    <div class="mt-6">
-      <a
-        href="/checkout"
-        class="w-full flex items-center justify-center rounded-md bg-indigo-600 px-6 py-3 text-xl font-medium text-white hover:bg-indigo-700"
-      >
-        Checkout
-      </a>
-    </div>
-  </div>
-</div>
-
-{% comment %} <div class="flex-1 flex flex-col {% if drawer!=true %} max-w-page mx-auto shadow-lg {% else %}  {% endif %}">
-  <div class="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
-    <div class="mt-8">
-      <div class="flow-root">
-        <ul role="list" class="-my-6 divide-y divide-gray-200">
-          {% for item in cart.items %}
-            <li class="flex py-6">
-              <div class="{% if drawer!=true %} size-48 {% else %} size-32 {% endif %} shrink-0 overflow-hidden rounded-md border border-gray-200 p-2">
-                <img
-                  height=""
-                  width=""
-                  src="{{ item.image | image_url: width: 400 }}"
-
-                  alt="Salmon orange fabric pouch with match zipper, gray zipper pull, and adjustable hip belt."
-                  class="size-full object-contain"
-                >
-              </div>
-
-              <div class="ml-4 flex flex-1 flex-col">
-                <div>
-                  <div class="flex justify-between text-xl font-medium text-gray-900">
-                    <h3>
-                      <a
-                        class="{% if drawer!=true %} text-4xl {% endif %}"
-                        title="{{ item.product.title }}"
-                        href="{{ item.url }}"
-                      >
-                        {{- item.title -}}
-                      </a>
-                    </h3>
-                    <p class="ml-4  {% if drawer!=true %} text-4xl {% else %} text-xl {% endif %}">
-                      {{ item.price | money_with_currency }}
-                    </p>
-                  </div>
-                  <p class="mt-1 text-base text-gray-500">{{ item.product_type }}</p>
-                </div>
-                <div class="flex flex-1 items-end justify-between text-sm">
-                  <p class="text-gray-500 {% if drawer!=true %} text-4xl {% else %} text-xl {% endif %}">
-                    Qty {{ item.quantity }}
-                  </p>
-
-                  <div class="flex">
-                    <button
-                      type="button"
-                      class="font-medium text-indigo-600 hover:text-indigo-500 {% if drawer!=true %} text-4xl {% else %} text-xl {% endif %}"
+                      class="font-medium text-red-600 hover:text-red-500 {% if drawer!=true %} text-4xl {% else %} text-xl {% endif %}"
                     >
                       Remove
                     </button>
@@ -311,44 +117,133 @@
 
   <div class="{% if drawer!=true %} flex flex-col items-end {% endif %}">
     {% render 'Tabs', drawer: drawer %}
-
-    <div class="border-t border-gray-200 px-4 py-6 sm:px-6 {% if drawer!=true %} w-2/5 {% endif %}">
-      <div class="flex justify-between text-xl font-medium text-gray-900">
+    <div
+      x-data
+      class="border-t border-gray-200 px-4 py-6 sm:px-6 {% if drawer!=true %} w-2/5 {% endif %}"
+    >
+      <div
+        class="flex justify-between text-xl font-medium text-gray-900"
+        x-data="{ SubTotalValue: window.SubTotalValue }"
+        x-init="window.alpineData = $data; $watch('SubTotalValue', value => window.SubTotalValue = value)"
+      >
         <p class="{% if drawer!=true %} text-4xl {% else %} text-xl {% endif %}">Subtotal</p>
-        <p class="{% if drawer!=true %} text-4xl {% else %} text-xl {% endif %}">
-          {{ cart.total_price | money_with_currency }}
-        </p>
+        <p class="{% if drawer!=true %} text-4xl {% else %} text-xl {% endif %}" x-text="SubTotalValue"></p>
       </div>
       <p class="mt-0.5 text-gray-500 {% if drawer!=true %} text-xl {% else %} text-xl {% endif %}">
-        Shipping, discounts and taxes calculated at checkout.
+        Shipping, taxes, and discounts calculated at checkout.
       </p>
       <div class="mt-6">
-        <button
-          type="submit"
-          id="checkout"
-          name="checkout"
-          {% if cart == empty %}
-            disabled
-          {% endif %}
-          form="cart"
-          class="w-full flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-xl font-medium text-white shadow-sm hover:bg-indigo-700"
+        <a
+          href="/checkout"
+          class="w-full flex items-center justify-center rounded-md bg-indigo-600 px-6 py-3 text-xl font-medium text-white hover:bg-indigo-700"
         >
-          {{ 'general.cart.continue_shopping' | t -}}
-        </button>
-      </div>
-      <div class="mt-6 flex justify-center text-center text-sm text-gray-500">
-        <p>
-          or
-          <button
-            @click="cartDrawer = false"
-            type="button"
-            class="font-medium text-indigo-600 hover:text-indigo-500"
-          >
-            Continue Shopping
-            <span aria-hidden="true"> &rarr;</span>
-          </button>
-        </p>
+          Checkout
+        </a>
       </div>
     </div>
   </div>
-</div> {% endcomment %}
+</div>
+
+{% comment %}
+  <div class="flex-1 flex flex-col {% if drawer!=true %} max-w-page mx-auto shadow-lg {% else %}  {% endif %}">
+    <div class="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
+      <div class="mt-8">
+        <div class="flow-root">
+          <ul role="list" class="-my-6 divide-y divide-gray-200">
+            {% for item in cart.items %}
+              <li class="flex py-6">
+                <div class="{% if drawer!=true %} size-48 {% else %} size-32 {% endif %} shrink-0 overflow-hidden rounded-md border border-gray-200 p-2">
+                  <img
+                    height=""
+                    width=""
+                    src="{{ item.image | image_url: width: 400 }}"
+
+                    alt="Salmon orange fabric pouch with match zipper, gray zipper pull, and adjustable hip belt."
+                    class="size-full object-contain"
+                  >
+                </div>
+
+                <div class="ml-4 flex flex-1 flex-col">
+                  <div>
+                    <div class="flex justify-between text-xl font-medium text-gray-900">
+                      <h3>
+                        <a
+                          class="{% if drawer!=true %} text-4xl {% endif %}"
+                          title="{{ item.product.title }}"
+                          href="{{ item.url }}"
+                        >
+                          {{- item.title -}}
+                        </a>
+                      </h3>
+                      <p class="ml-4  {% if drawer!=true %} text-4xl {% else %} text-xl {% endif %}">
+                        {{ item.price | money_with_currency }}
+                      </p>
+                    </div>
+                    <p class="mt-1 text-base text-gray-500">{{ item.product_type }}</p>
+                  </div>
+                  <div class="flex flex-1 items-end justify-between text-sm">
+                    <p class="text-gray-500 {% if drawer!=true %} text-4xl {% else %} text-xl {% endif %}">
+                      Qty {{ item.quantity }}
+                    </p>
+
+                    <div class="flex">
+                      <button
+                        type="button"
+                        class="font-medium text-indigo-600 hover:text-indigo-500 {% if drawer!=true %} text-4xl {% else %} text-xl {% endif %}"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="{% if drawer!=true %} flex flex-col items-end {% endif %}">
+      {% render 'Tabs', drawer: drawer %}
+
+      <div class="border-t border-gray-200 px-4 py-6 sm:px-6 {% if drawer!=true %} w-2/5 {% endif %}">
+        <div class="flex justify-between text-xl font-medium text-gray-900">
+          <p class="{% if drawer!=true %} text-4xl {% else %} text-xl {% endif %}">Subtotal</p>
+          <p class="{% if drawer!=true %} text-4xl {% else %} text-xl {% endif %}">
+            {{ cart.total_price | money_with_currency }}
+          </p>
+        </div>
+        <p class="mt-0.5 text-gray-500 {% if drawer!=true %} text-xl {% else %} text-xl {% endif %}">
+          Shipping, discounts and taxes calculated at checkout.
+        </p>
+        <div class="mt-6">
+          <button
+            type="submit"
+            id="checkout"
+            name="checkout"
+            {% if cart == empty %}
+              disabled
+            {% endif %}
+            form="cart"
+            class="w-full flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-xl font-medium text-white shadow-sm hover:bg-indigo-700"
+          >
+            {{ 'general.cart.continue_shopping' | t -}}
+          </button>
+        </div>
+        <div class="mt-6 flex justify-center text-center text-sm text-gray-500">
+          <p>
+            or
+            <button
+              @click="cartDrawer = false"
+              type="button"
+              class="font-medium text-indigo-600 hover:text-indigo-500"
+            >
+              Continue Shopping
+              <span aria-hidden="true"> &rarr;</span>
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endcomment %}

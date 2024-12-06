@@ -3,30 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Global Variable with Alpine.js</title>
+  <title>Line Wobble Animation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* From Uiverse.io by G4b413l */
+    .line-wobble {
+      --uib-size: 80px;
+      --uib-speed: 1.55s;
+      --uib-color: black;
+      --uib-line-weight: 5px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: var(--uib-line-weight);
+      width: var(--uib-size);
+      border-radius: calc(var(--uib-line-weight) / 2);
+      overflow: hidden;
+      transform: translate3d(0, 0, 0);
+    }
 
-  <script>
-    // Define a global variable in the head
-    window.globalValue = "Initial Value from Head Script";
+    .line-wobble::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background-color: var(--uib-color);
+      opacity: 0.1;
+    }
 
-    // Function to change the global variable's value
-    function changeGlobalValue(newValue) {
-      window.globalValue = newValue;
-      // Trigger Alpine.js to update its reactive state
-      if (window.alpineData) {
-        window.alpineData.globalValue = newValue;
+    .line-wobble::after {
+      content: '';
+      height: 100%;
+      width: 100%;
+      border-radius: calc(var(--uib-line-weight) / 2);
+      animation: wobble var(--uib-speed) ease-in-out infinite;
+      transform: translateX(-90%);
+      background-color: var(--uib-color);
+    }
+
+    @keyframes wobble {
+      0%, 100% {
+        transform: translateX(-90%);
+      }
+
+      50% {
+        transform: translateX(90%);
       }
     }
-  </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  </style>
 </head>
 <body>
-  <div x-data="{ globalValue: window.globalValue }" x-init="window.alpineData = $data; $watch('globalValue', value => window.globalValue = value)">
-    <p x-text="globalValue"></p>
-    <button @click="globalValue = 'Changed Value from Alpine Button'">Change Value (Alpine)</button>
-    <button @click="changeGlobalValue('Changed Value from Function in Head')">Change Value (Function in Head)</button>
-  </div>
-
+  <div class="line-wobble w-full"></div>
 </body>
 </html>
