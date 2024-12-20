@@ -1,379 +1,133 @@
-{% layout none %}
-<script defer src="https://cdn.tailwindcss.com"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoice Form</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="">
+  <div class="hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 ease-out transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
+    <div class="relative flex flex-col bg-white shadow-lg rounded-xl pointer-events-auto dark:bg-neutral-800">
+      <div class="relative overflow-hidden min-h-32 bg-gray-900 text-center rounded-t-xl dark:bg-neutral-950">
+ 
+        <!-- <div class="absolute top-2 end-2">
+          <button type="button" class="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-white/10 text-white hover:bg-white/20 focus:outline-none focus:bg-white/20 disabled:opacity-50 disabled:pointer-events-none" aria-label="Close" data-hs-overlay="#hs-bg-gray-on-hover-cards" data-hs-remove-element="#hs-ai-modal">
+            <span class="sr-only">Close</span>
+            <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+          </button>
+        </div> -->
 
-<script>
-    function getsubtotal(subTotal,currencyIso) {
-    let stotal=subTotal/100
-    return  cartItem('','','',stotal,currencyIso).formatCurrency(stotal,'en-IN',currencyIso)
-  }
+        <figure class="absolute inset-x-0 bottom-0 -mb-px">
+          <svg preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 1920 100.1">
+            <path fill="currentColor" class="fill-white dark:fill-neutral-800" d="M0,0c0,0,934.4,93.4,1920,0v100.1H0L0,0z"></path>
+          </svg>
+        </figure>
+  
+      </div>
+
+      <div class="relative z-10 -mt-12">
+
+        <span class="mx-auto flex justify-center items-center size-[62px] rounded-full border border-gray-200 bg-white text-gray-700 shadow-sm dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400">
+          <svg class="shrink-0 size-6" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M1.92.506a.5.5 0 0 1 .434.14L3 1.293l.646-.647a.5.5 0 0 1 .708 0L5 1.293l.646-.647a.5.5 0 0 1 .708 0L7 1.293l.646-.647a.5.5 0 0 1 .708 0L9 1.293l.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .801.13l.5 1A.5.5 0 0 1 15 2v12a.5.5 0 0 1-.053.224l-.5 1a.5.5 0 0 1-.8.13L13 14.707l-.646.647a.5.5 0 0 1-.708 0L11 14.707l-.646.647a.5.5 0 0 1-.708 0L9 14.707l-.646.647a.5.5 0 0 1-.708 0L7 14.707l-.646.647a.5.5 0 0 1-.708 0L5 14.707l-.646.647a.5.5 0 0 1-.708 0L3 14.707l-.646.647a.5.5 0 0 1-.801-.13l-.5-1A.5.5 0 0 1 1 14V2a.5.5 0 0 1 .053-.224l.5-1a.5.5 0 0 1 .367-.27zm.217 1.338L2 2.118v11.764l.137.274.51-.51a.5.5 0 0 1 .707 0l.646.647.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.509.509.137-.274V2.118l-.137-.274-.51.51a.5.5 0 0 1-.707 0L12 1.707l-.646.647a.5.5 0 0 1-.708 0L10 1.707l-.646.647a.5.5 0 0 1-.708 0L8 1.707l-.646.647a.5.5 0 0 1-.708 0L6 1.707l-.646.647a.5.5 0 0 1-.708 0L4 1.707l-.646.647a.5.5 0 0 1-.708 0l-.509-.51z"></path>
+            <path d="M3 4.5a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm8-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5z"></path>
+          </svg>
+        </span>
+   
+      </div>
 
 
-    function cartItem(initialQuantity, LinePrice, itemId, subTotal, currencyIso) {
-      return {
-        quantity: initialQuantity,
-        Totalprice: LinePrice / 100,
-        isVisible: true,
-        currency: currencyIso,
-        locale: 'en-IN',
-        {% comment %} subTotalAmt: subTotal / 100, {% endcomment %}
+      <div class="p-4 sm:p-7 overflow-y-auto">
+        <div class="text-center">
+          <h3 id="hs-ai-modal-label" class="text-lg font-semibold text-gray-800 dark:text-neutral-200">
+            Invoice from Preline
+          </h3>
+          <p class="text-sm text-gray-500 dark:text-neutral-500">
+            Invoice #3682303
+          </p>
+        </div>
 
-        currencyLocaleMap: {
-          USD: 'en-US',
-          GBP: 'en-GB',
-          EUR: 'de-DE',
-          INR: 'en-IN',
-          JPY: 'ja-JP',
-        },
-        decreaseQuantity() {
-          if (this.quantity > 1) {
-            this.updateCart(this.quantity - 1);
-          }
-        },
-        increaseQuantity() {
-          this.updateCart(this.quantity + 1);
-        },
-        async updateCart(newQuantity) {
-          const response = await fetch('/cart/change.js', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: itemId, quantity: newQuantity }),
-          });
-          if (response.ok) {
-            const cart = await response.json().then(this.getUpdatedCartItems());
-          }
-        },
-        async removeItem() {
-          const response = await fetch('/cart/change.js', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: itemKey, quantity: 0 }),
-          });
-          const cart = await response.json();
-          this.isVisible = false;
-          this.updateCartSubtotal(cart);
-        },
-        updateCartSubtotal(cart) {
-          document.querySelector('#cartSubtotal').textContent = cart.total_price.toFixed(2);
-        },
+ 
+        <div class="mt-5 sm:mt-10 grid grid-cols-2 sm:grid-cols-3 gap-5">
+          <div>
+            <span class="block text-xs uppercase text-gray-500 dark:text-neutral-500">Amount paid:</span>
+            <span class="block text-sm font-medium text-gray-800 dark:text-neutral-200">$316.8</span>
+          </div>
 
-        async getUpdatedCartItems() {
-          const response = await fetch('/cart.js', {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-          });
-          if (response.ok) {
-            const data = await response.json();
-            const itemsArray = data.items;
-            const foundItem = itemsArray.find((item) => item.id === parseInt(itemId));
-            console.log(data, 'found');
-            if (foundItem) {
-              this.quantity = foundItem.quantity;
-              this.price = foundItem.price;
-              this.Totalprice = foundItem.line_price / 100;
-              this.currency = data.currency;
-              document.getElementById('subtotal').textContent = getsubtotal(data.items_subtotal_price,currencyIso);
-              {% comment %} subTotalAmt = data.items_subtotal_price / 100; {% endcomment %}
-            }
-            console.log('Response data:', data.items);
-          } else {
-            console.error('Fetch error:', response.status, response.statusText);
-          }
-        },
 
-        formatCurrency(amount, locale, currency) {
-          let formatted = new Intl.NumberFormat(locale, {
-            style: 'currency',
-            currency: currency,
-          }).format(amount || 0);
+          <div>
+            <span class="block text-xs uppercase text-gray-500 dark:text-neutral-500">Date paid:</span>
+            <span class="block text-sm font-medium text-gray-800 dark:text-neutral-200">April 22, 2020</span>
+          </div>
 
-          if (currency === 'INR') {
-            formatted = formatted.replace('₹', 'Rs.');
-          }
-          return formatted;
-        },
+          
+          <div>
+            <span class="block text-xs uppercase text-gray-500 dark:text-neutral-500">Payment method:</span>
+            <div class="flex items-center gap-x-2">
+              <svg class="size-5" width="400" height="248" viewBox="0 0 400 248" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g clip-path="url(#clip0)">
+                <path d="M254 220.8H146V26.4H254V220.8Z" fill="#FF5F00"></path>
+                <path d="M152.8 123.6C152.8 84.2 171.2 49 200 26.4C178.2 9.2 151.4 0 123.6 0C55.4 0 0 55.4 0 123.6C0 191.8 55.4 247.2 123.6 247.2C151.4 247.2 178.2 238 200 220.8C171.2 198.2 152.8 163 152.8 123.6Z" fill="#EB001B"></path>
+                <path d="M400 123.6C400 191.8 344.6 247.2 276.4 247.2C248.6 247.2 221.8 238 200 220.8C228.8 198.2 247.2 163 247.2 123.6C247.2 84.2 228.8 49 200 26.4C221.8 9.2 248.6 0 276.4 0C344.6 0 400 55.4 400 123.6Z" fill="#F79E1B"></path>
+                </g>
+                <defs>
+                <clipPath id="clip0">
+                <rect width="400" height="247.2" fill="white"></rect>
+                </clipPath>
+                </defs>
+              </svg>
+              <span class="block text-sm font-medium text-gray-800 dark:text-neutral-200">•••• 4242</span>
+            </div>
+          </div>
+   
+        </div>
 
-        updateLocale() {
-          this.locale = this.currencyLocaleMap[this.currency] || 'en-US';
-        },
-      };
-    }
-</script>
 
-<div class="flex-1 flex flex-col {% if drawer != true %} max-w-page mx-auto shadow-lg {% endif %}">
-  <div class="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
-    <div class="mt-8">
-      <div class="flow-root">
-        <ul role="list" class="-my-6 divide-y divide-gray-200">
-          {% for item in cart.items %}
-            <li
-              x-data="cartItem({{ item.quantity }},'{{ item.line_price }}','{{ item.id }}','{{ cart.total_price }}','{{ cart.currency.iso_code }}')"
-              x-show="isVisible"
-              class="flex py-6"
-            >
-              {% comment %} <div x-text="price"></div> {% endcomment %}
+        <div class="mt-5 sm:mt-10">
+          <h4 class="text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">Summary</h4>
 
-              <div
-                class="{% if drawer != true %} size-48 {% else %} size-32 {% endif %} shrink-0 overflow-hidden rounded-md border border-gray-200 p-2"
-              >
-                <img
-                  src="{{ item.image | image_url: width: 400 }}"
-                  alt="{{ item.product.title }}"
-                  class="size-full object-contain"
-                  height=""
-                  width=""
-                >
-              </div>
-
-              <!-- Product Details -->
-              <div class="ml-4 flex flex-1 flex-col">
-                <div>
-                  <div class="flex justify-between text-xl font-medium text-gray-900">
-                    <h3>
-                      <a
-                        class="{% if drawer != true %} text-4xl {% endif %}"
-                        href="{{ item.url }}"
-                      >
-                        {{ item.title }}
-                      </a>
-                    </h3>
-                    <p class="ml-4 {% if drawer != true %} text-4xl {% else %} text-xl {% endif %}">
-                      <span>
-                        {{ item.price | money_with_currency }}
-                      </span>
-                      <span class="text-black">&#x2716;</span>
-                      <span x-text="quantity"></span>:
-                      <span x-text="formatCurrency(Totalprice, locale, currency)"></span>
-                      {% comment %} <span x-text="Totalprice"></span> {% endcomment %}
-                      {% comment %} {{ item.line_price | money_with_currency }} {% endcomment %}
-                    </p>
-                  </div>
-                  <p class="mt-1 text-base text-gray-500">{{ item.product_type }}</p>
-                </div>
-
-                <!-- Quantity Controls -->
-                <div class="flex flex-1 items-end justify-between text-sm">
-                  <div class="w-5/12">
-                    <p class="text-gray-500 {% if drawer != true %} text-4xl {% else %} text-xl {% endif %}">Qty</p>
-                    <div class="flex mt-2">
-                      <button
-                        type="button"
-                        title="Decrease quantity"
-                        @click="decreaseQuantity"
-                        class="border rounded-l-lg px-4 py-2 bg-gray-200 hover:bg-gray-300"
-                      >
-                        &minus;
-                      </button>
-                      <input
-                        type="number"
-                        x-model="quantity"
-                        min="1"
-                        class="w-12 text-center border-t border-b"
-                      >
-                      <button
-                        type="button"
-                        title="Increase quantity"
-                        @click="increaseQuantity"
-                        class="border rounded-r-lg px-4 py-2 bg-gray-200 hover:bg-gray-300"
-                      >
-                        &plus;
-                      </button>
-                    </div>
-                  </div>
-
-                  <div class="flex">
-                    <button
-                      @click.prevent="removeItem"
-                      type="button"
-                      class="font-medium text-red-600 hover:underline"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </div>
+          <ul class="mt-3 flex flex-col">
+            <li class="inline-flex items-center gap-x-2 py-3 px-4 text-sm border text-gray-800 -mt-px first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:border-neutral-700 dark:text-neutral-200">
+              <div class="flex items-center justify-between w-full">
+                <span>Payment to Front</span>
+                <span>$264.00</span>
               </div>
             </li>
-          {% endfor %}
-        </ul>
+            <li class="inline-flex items-center gap-x-2 py-3 px-4 text-sm border text-gray-800 -mt-px first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:border-neutral-700 dark:text-neutral-200">
+              <div class="flex items-center justify-between w-full">
+                <span>Tax fee</span>
+                <span>$52.8</span>
+              </div>
+            </li>
+            <li class="inline-flex items-center gap-x-2 py-3 px-4 text-sm font-semibold bg-gray-50 border text-gray-800 -mt-px first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-200">
+              <div class="flex items-center justify-between w-full">
+                <span>Amount paid</span>
+                <span>$316.8</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+
+        <div class="mt-5 flex justify-end gap-x-2">
+          <a class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus:bg-gray-50 dark:bg-transparent dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:focus:bg-neutral-800" href="#" target="_parent">
+            <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>
+            Invoice PDF
+          </a>
+          <a class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none" href="#" target="_parent">
+            <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect width="12" height="8" x="6" y="14"></rect></svg>
+            Print
+          </a>
+        </div>
+
+
+        <div class="mt-5 sm:mt-10">
+          <p class="text-sm text-gray-500 dark:text-neutral-500">If you have any questions, please contact us at <a class="inline-flex items-center gap-x-1.5 text-blue-600 decoration-2 hover:underline focus:outline-none focus:underline font-medium dark:text-blue-500" href="#" target="_parent">example@site.com</a> or call at <a class="inline-flex items-center gap-x-1.5 text-blue-600 decoration-2 hover:underline focus:outline-none focus:underline font-medium dark:text-blue-500" href="tel:+1898345492">+1 898-34-5492</a></p>
+        </div>
       </div>
+
     </div>
   </div>
-
-  <!-- Cart Summary -->
-  <div class="border-t border-gray-200 px-4 py-6 sm:px-6">
-    <div
-      x-data
-      class="flex justify-between text-xl font-medium text-gray-900"
-    >
-      <p>Subtotal</p>
-      {% comment %} <p x-text="window.subTotalAmt"></p> {% endcomment %}
-
-      <span id="subtotal" x-text="getsubtotal('{{ cart.total_price }}','{{ cart.currency.iso_code }}')"></span>
-      {% comment %}
-        <p x-text="formatCurrency(subTotalAmt, locale, currency)">
-        {{ cart.total_price | money_with_currency }}
-        </p>
-      {% endcomment %}
-    </div>
-    <p class="mt-0.5 text-gray-500">Shipping, taxes, and discounts calculated at checkout.</p>
-    <div class="mt-6">
-      <a
-        href="/checkout"
-        class="w-full flex items-center justify-center rounded-md bg-indigo-600 px-6 py-3 text-xl font-medium text-white hover:bg-indigo-700"
-      >
-        Checkout
-      </a>
-    </div>
-  </div>
-</div>
-
-{% comment %}
-  <script>
-    document.addEventListener('alpine:init', () => {
-      Alpine.data('cartItem', (initialQuantity, itemKey) => ({
-        quantity: initialQuantity,
-        itemKey: itemKey,
-        formattedPrice: '',
-        cartSubtotal: '{{ cart.total_price | money }}',
-        isVisible: true, // Control visibility of the item
-
-        // Fetch formatted price based on quantity
-        updatePrice() {
-          fetch('/cart.js')
-            .then((response) => response.json())
-            .then((cart) => {
-              const item = cart.items.find((i) => i.key === this.itemKey);
-              this.formattedPrice = item ? Shopify.formatMoney(item.line_price) : '';
-              this.cartSubtotal = Shopify.formatMoney(cart.total_price);
-            });
-
-          let responce = fetch('/cart.js', {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-          });
-
-          console.log(responce, 'oopoo');
-        },
-
-        // Decrease quantity
-        decreaseQuantity() {
-          if (this.quantity > 1) {
-            this.quantity -= 1;
-            this.updateCart();
-          }
-        },
-
-        // Increase quantity
-        increaseQuantity() {
-          this.quantity += 1;
-          this.updateCart();
-        },
-
-        // Update cart via Shopify API
-        updateCart() {
-          fetch('/cart/change.js', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: this.itemKey, quantity: this.quantity }),
-          })
-            .then(() => this.updatePrice())
-            .catch((error) => console.error('Error updating cart:', error));
-        },
-
-        // Remove item from cart
-        removeItem() {
-          fetch('/cart/change.js', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: this.itemKey, quantity: 0 }),
-          })
-            .then(() => {
-              this.isVisible = false; // Hide item from the DOM
-              this.updatePrice(); // Update subtotal
-            })
-            .catch((error) => console.error('Error removing item:', error));
-        },
-      }));
-    });
-  </script>
-{% endcomment %}
-
-{% comment %}
-  <section class="cart-page container mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-4">Your Cart</h1>
-
-    {% if cart.item_count > 0 %}
-      <div class="overflow-x-auto">
-        <table class="w-full border-collapse border border-gray-200">
-          <thead>
-            <tr class="bg-gray-100">
-              <th class="border border-gray-300 px-4 py-2 text-left">Product</th>
-              <th class="border border-gray-300 px-4 py-2 text-center">Quantity</th>
-              <th class="border border-gray-300 px-4 py-2 text-right">Price</th>
-              <th class="border border-gray-300 px-4 py-2 text-right">Remove</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for item in cart.items %}
-              <tr
-                x-data="cartItem({{ item.quantity }}, '{{ item.key }}')"
-                x-show="isVisible"
-                class="hover:bg-gray-50"
-              >
-                <td class="border border-gray-300 px-4 py-2">
-                  <a href="{{ item.url }}" class="flex items-center gap-4">
-                    <img src="{{ item.image | img_url: 'medium' }}" alt="{{ item.title }}" class="w-16 h-16 object-cover">
-                    <span class="text-gray-800">{{ item.title }}</span>
-                  </a>
-                </td>
-                <td class="border border-gray-300 px-4 py-2 text-center">
-                  <div class="flex items-center justify-center gap-2">
-                    <button
-                      class="px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-                      @click="decreaseQuantity()"
-                    >
-                      -
-                    </button>
-                    <input
-                      type="text"
-                      x-model="quantity"
-                      readonly
-                      class="w-12 text-center border border-gray-300 rounded bg-gray-50"
-                    >
-                    <button
-                      class="px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-                      @click="increaseQuantity()"
-                    >
-                      +
-                    </button>
-                  </div>
-                </td>
-                <td class="border border-gray-300 px-4 py-2 text-right">
-                  <span x-text="formattedPrice"></span>
-                </td>
-                <td class="border border-gray-300 px-4 py-2 text-right">
-                  <a
-                    href="#"
-                    @click.prevent="removeItem()"
-                    class="text-red-500 hover:underline"
-                  >
-                    Remove
-                  </a>
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-
-      <div class="mt-6 text-right">
-        <p class="text-lg font-semibold" x-text="'Subtotal: ' + cartSubtotal"></p>
-        <a href="/checkout" class="inline-block mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-          Proceed to Checkout
-        </a>
-      </div>
-    {% else %}
-      <p>Your cart is empty. <a href="/collections/all" class="text-blue-600 hover:underline">Continue shopping</a></p>
-    {% endif %}
-  </section>
-{% endcomment %}
+</body>
+</html>

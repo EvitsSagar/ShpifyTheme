@@ -17,6 +17,56 @@ module.exports = {
         page: 'var(--page-width)',
       },
       keyframes: {
+        fadeInRight: {
+          '0%': {
+            opacity: '0',
+            transform: 'translateX(50px)',
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateX(0)',
+          },
+        },
+        slideInRight: {
+          '0%': {
+            transform: 'translateX(100%)',
+            opacity: '0',
+          },
+          '100%': {
+            transform: 'translateX(0)',
+            opacity: '1',
+          },
+        },
+        slideOutLeft: {
+          '0%': {
+            transform: 'translateX(0)',
+            opacity: '1',
+          },
+          '100%': {
+            transform: 'translateX(-100%)',
+            opacity: '0',
+          },
+        },
+        slideInLeft: {
+          '0%': {
+            transform: 'translateX(-100%)',
+            opacity: '0',
+          },
+          '100%': {
+            transform: 'translateX(0)',
+            opacity: '1',
+          },
+        },
+        slideOutRight: {
+          '0%': {
+            transform: 'translateX(0)',
+            opacity: '1',
+          },
+          '100%': {
+            transform: 'translateX(100%)',
+            opacity: '0',
+          },
+        },
         "fadeUp": {
           '0%': { opacity: '0', transform: 'translateY(20px) scale(1)' },
           '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
@@ -1141,7 +1191,8 @@ module.exports = {
         fadeinbounceup: 'fade-in-bounceup 1s ease-in-out 0.25s 1',
         fadeinbounceright: 'fade-in-bounce-right 1s ease-in-out 0.25s 1',
         fadeinbounceleft: 'fade-in-bounce-left 1s ease-in-out 0.25s 1',
-        fadeinright: 'fade-in-right 1s ease-in-out 0.25s 1',
+        // fadeinright: 'fade-in-right 1s ease-in-out 0.25s 1',
+        fadeInRight: 'fadeInRight 1s ease-out forwards',
         fadeinup: 'fade-in-up 1s ease-in-out 0.25s 1',
         fadeoutdown: 'fade-out-down 1s ease-in-out 0.25s 1',
         fadeouttopleft: 'fade-out-top-left 1s ease-in-out 0.25s 1',
@@ -1150,12 +1201,16 @@ module.exports = {
         fadeoutright: 'fade-out-right 1s ease-in-out 0.25s 1',
         fadeoutup: 'fade-out-up 1s ease-in-out 0.25s 1',
         slideindown: 'slide-in-down 1s ease-in-out 0.25s 1',
-        slideinleft: 'slide-in-left 1s ease-in-out 0.25s 1',
-        slideinright: 'slide-in-right 1s ease-in-out 0.25s 1',
+        // slideinleft: 'slide-in-left 1s ease-in-out 0.25s 1',
+        // slideinright: 'slide-in-right 1s ease-in-out 0.25s 1',
         slideinup: 'slide-in-up 1s ease-in-out 0.25s 1',
         slideoutdown: 'slide-out-down 1s ease-in-out 0.25s 1',
-        slideoutleft: 'slide-out-left 1s ease-in-out 0.25s 1',
-        slideoutright: 'slide-out-right 1s ease-in-out 0.25s 1',
+        slideInRight: 'slideInRight 1s ease-out',
+        slideOutLeft: 'slideOutLeft 1s ease-out',
+        slideInLeft: 'slideInLeft 1s ease-out',
+        slideOutRight: 'slideOutRight 1s ease-out',
+        // slideoutleft: 'slide-out-left 1s ease-in-out 0.25s 1',
+        // slideoutright: 'slide-out-right 1s ease-in-out 0.25s 1',
         slideoutup: 'slide-out-up 1s ease-in-out 0.25s 1',
         slidedown: 'slide-down 1s ease-in-out 0.25s 1',
         slideleft: 'slide-left 1s ease-in-out 0.25s 1',
