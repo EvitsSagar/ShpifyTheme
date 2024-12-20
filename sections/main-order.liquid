@@ -844,6 +844,19 @@
   </div>
 </div>
 
+{% comment %}
+  <div class="h-screen" x-data="{ rotated: false }">
+    <div
+      x-intersect:enter="rotated = true"
+      x-intersect:leave="rotated = false"
+      :class="{ 'rotate-0': !rotated, 'rotate-45': rotated }"
+      class="transition-transform duration-500"
+    >
+      Rotate Me!
+    </div>
+  </div>
+{% endcomment %}
+
 {% schema %}
 {
   "name": "t:sections.main-order.name",
