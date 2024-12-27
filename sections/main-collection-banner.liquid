@@ -1,39 +1,246 @@
 {% comment %}theme-check-disable ImgLazyLoading{% endcomment %}
 
-<div class="collection-hero{% if section.settings.show_collection_image and collection.image %} collection-hero--with-image{% endif %} color-{{ section.settings.color_scheme }} gradient">
-  <div class="collection-hero__inner page-width {% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
-    <div class="px-[27px] py-10 collection-hero__text-wrapper">
-      <h2 class="max-w-page mx-auto">
-        {% comment %} <span class="visually-hidden">{{ 'sections.collection_template.title' | t }}: </span> {% endcomment %}
-        {{- collection.title | escape -}}
-      </h2>
+<div class="max-w-page mx-auto">
+  <div class="py-10 collection-hero__text-wrapper">
+    <h2 class="">
+      {% comment %} <span class="visually-hidden">{{ 'sections.collection_template.title' | t }}: </span> {% endcomment %}
+      {{- collection.title | escape -}}
+    </h2>
 
-      {%- if section.settings.show_collection_description -%}
-        <div class="collection-hero__description rte">{{ collection.description }}</div>
-      {%- endif -%}
-    </div>
-
-    {%- if section.settings.show_collection_image and collection.image -%}
-      <div class="collection-hero__image-container media gradient">
-        <img
-          srcset="
-            {%- if collection.image.width >= 165 -%}{{ collection.image | image_url: width: 165 }} 165w,{%- endif -%}
-            {%- if collection.image.width >= 360 -%}{{ collection.image | image_url: width: 360 }} 360w,{%- endif -%}
-            {%- if collection.image.width >= 535 -%}{{ collection.image | image_url: width: 535 }} 535w,{%- endif -%}
-            {%- if collection.image.width >= 750 -%}{{ collection.image | image_url: width: 750 }} 750w,{%- endif -%}
-            {%- if collection.image.width >= 1070 -%}{{ collection.image | image_url: width: 1070 }} 1070w,{%- endif -%}
-            {%- if collection.image.width >= 1500 -%}{{ collection.image | image_url: width: 1500 }} 1500w,{%- endif -%}
-            {{ collection.image | image_url }} {{ collection.image.width }}w
-          "
-          src="{{ collection.image | image_url: width: 750 }}"
-          sizes="(min-width: {{ settings.page_width }}px) {{ settings.page_width | minus: 100 | divided_by: 2 }}px, (min-width: 750px) calc(50vw - 130px), calc(50vw - 55px)"
-          alt="{{ collection.image.alt | escape }}"
-          width="{{ collection.image.width }}"
-          height="{{ collection.image.height }}"
-        >
-      </div>
+    {%- if section.settings.show_collection_description -%}
+      <div class="collection-hero__description rte">{{ collection.description }}</div>
     {%- endif -%}
   </div>
+
+  {% assign sort_by = collection.sort_by | default: collection.default_sort_by %}
+  <div class="py-10 flex justify-between " id="CollectionFilterView">
+    <div class="flex items-end space-x-4" x-data="{ open: false , loading : false}">
+      <p
+        x-show="open"
+        class="flex text-xl justify-center items-center m-1 font-medium py-1 px-3 rounded-full text-gray-100 bg-gray-700 border border-gray-700 hover:bg-gray-600"
+      >
+        {% comment %} <a href="{{ collection.url }}?sort_by={{ collection.sort_by }}" >Clear all</a> {% endcomment %}
+        <a
+          href="#"
+          @click.prevent="
+            $nextTick(() => {
+              const queryString = '';
+              loading = true;
+              fetch('/collections/{{ collection.handle }}?' + queryString)
+                .then(response => response.text())
+                .then(data => {
+                  let html_div = document.createElement('div');
+                  html_div.innerHTML = data;
+
+                  let html_dom = html_div.querySelector('#CollectionProducts').innerHTML;
+                  document.querySelector('#CollectionProducts').innerHTML = html_dom;
+
+                  let updatedFilters = html_div.querySelector('#CollectionFilterView').innerHTML;
+                  document.querySelector('#CollectionFilterView').innerHTML = updatedFilters;
+
+                  let updatedFilterBar = html_div.querySelector('#upatedSideFilterBar').innerHTML;
+                  document.querySelector('#upatedSideFilterBar').innerHTML = updatedFilterBar;
+
+                  history.replaceState(null, null, '{{ collection.url }}');
+                })
+                .catch(error => console.error('Error:', error))
+                .finally(() => loading = false);
+            })
+          "
+          >Clear all</a
+        >
+      </p>
+      {% render 'On-page-loader' %}
+      {%- for filter in collection.filters -%}
+        {%- if filter.type == 'price_range' -%}
+          {%- if filter.min_value.value != null or filter.max_value.value != null -%}
+            <span
+              class="hidden"
+              x-show="open"
+              x-effect="open=true"
+            ></span>
+
+            <p class="flex text-xl justify-center items-center m-1 font-medium py-1 px-3 rounded-full text-gray-100 bg-gray-700 border border-gray-700">
+              <span class="flex items-center justify-center space-x-2">
+                <span>
+                  {%- assign min_value = filter.min_value.value | default: 0 -%}
+                  {%- assign max_value = filter.max_value.value | default: filter.range_max -%}
+                  {{ min_value | money }} - {{ max_value | money }}
+                </span>
+                <a
+                  href="{{ filter.url_to_remove }}"
+                  @click.prevent="
+                    $nextTick(() => {
+                      loading = true;
+
+                      fetch('{{ filter.url_to_remove }}')
+                        .then(response => response.text())
+                        .then(data => {
+
+                          let html_div = document.createElement('div');
+                          html_div.innerHTML = data;
+
+                          let html_dom = html_div.querySelector('#CollectionProducts').innerHTML;
+                          document.querySelector('#CollectionProducts').innerHTML = html_dom;
+
+                          let updatedFilters = html_div.querySelector('#CollectionFilterView').innerHTML;
+                          document.querySelector('#CollectionFilterView').innerHTML = updatedFilters;
+
+                          let updatedFilterBar = html_div.querySelector('#upatedSideFilterBar').innerHTML;
+                          document.querySelector('#upatedSideFilterBar').innerHTML = updatedFilterBar;
+
+                          history.replaceState(null, null, '{{ filter.url_to_remove }}');
+                        })
+                        .catch(error => console.error('Error:', error))
+                        .finally(() => loading = false);
+                    })
+                  "
+                >
+                  <svg
+                    class="hover:text-gray-300"
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="18px"
+                    viewBox="0 -960 960 960"
+                    width="18px"
+                    fill="currentcolor"
+                  >
+                    <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+                  </svg>
+                </a>
+              </span>
+            </p>
+          {%- endif -%}
+        {%- else -%}
+          {%- if filter.active_values.size != 0 -%}
+            <span
+              class="hidden"
+              x-effect="
+                if({{filter.active_values.size}}!=0){
+                  open=true;
+                }
+              "
+            ></span>
+            {%- for filter_value in filter.active_values -%}
+              <p class="flex text-xl justify-center items-center m-1 font-medium py-1 px-3 rounded-full text-gray-100 bg-gray-700 border border-gray-700">
+                <span class="flex items-center justify-center space-x-2">
+                  <span> {{ filter.label }}: {{ filter_value.label }} </span>
+                  <a
+                    href="#"
+                    @click.prevent="
+                      $nextTick(() => {
+                        loading = true;
+
+                        fetch('{{ filter_value.url_to_remove }}')
+                          .then(response => response.text())
+                          .then(data => {
+                            // Create a temporary DOM container to parse the response
+                            let html_div = document.createElement('div');
+                            html_div.innerHTML = data;
+
+                            // Extract the updated products list and update the DOM
+                            let html_dom = html_div.querySelector('#CollectionProducts').innerHTML;
+                            document.querySelector('#CollectionProducts').innerHTML = html_dom;
+
+                            let updatedFilters = html_div.querySelector('#CollectionFilterView').innerHTML;
+                            document.querySelector('#CollectionFilterView').innerHTML = updatedFilters;
+
+                            let updatedFilterBar = html_div.querySelector('#upatedSideFilterBar').innerHTML;
+                            document.querySelector('#upatedSideFilterBar').innerHTML = updatedFilterBar;
+
+                            // Update the URL without refreshing the page
+                            history.replaceState(null, null, '{{ filter_value.url_to_remove }}');
+                          })
+                          .catch(error => console.error('Error:', error))
+                          .finally(() => loading = false);
+                      })
+                    "
+                  >
+                    <svg
+                      class="hover:text-gray-300"
+                      xmlns="http://www.w3.org/2000/svg"
+                      height="18px"
+                      viewBox="0 -960 960 960"
+                      width="18px"
+                      fill="currentcolor"
+                    >
+                      <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+                    </svg>
+                  </a>
+                </span>
+              </p>
+            {%- endfor -%}
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    <div
+      class="max-w-sm"
+      x-data="
+        {
+          loading: false,
+          sort: '{{ sort_by }}',
+          sortCollection(){
+            this.loading = true;
+            fetch('/collections/{{ collection.handle }}?sort_by=' + this.sort)
+              .then(response => response.text())
+              .then(data => {
+                let html_div = document.createElement('div');
+                html_div.innerHTML = data;
+
+                let html_dom = html_div.querySelector('#CollectionProducts').innerHTML;
+                document.querySelector('#CollectionProducts').innerHTML = html_dom;
+                // update url without refreshing the page
+                history.replaceState(null, null, '?sort_by=' + this.sort);
+              })
+              .catch(error => console.error('Error:', error))
+              .finally(() => this.loading = false);
+          }
+        }
+      "
+    >
+      {% render 'On-page-loader' %}
+      <label for="sort-by" class="block mb-2 font-medium text-gray-900 dark:text-white ml-[3px]">Sort-by</label>
+      <select
+        id="sort-by"
+        x-model="sort"
+        @change="sortCollection()"
+        class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      >
+        {% for option in collection.sort_options %}
+          <option
+            value="{{ option.value }}"
+            {% if option.value == sort_by %}
+              selected="selected"
+            {% endif %}
+          >
+            {{ option.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  {%- if section.settings.show_collection_image and collection.image -%}
+    <div class="collection-hero__image-container media gradient">
+      <img
+        srcset="
+          {%- if collection.image.width >= 165 -%}{{ collection.image | image_url: width: 165 }} 165w,{%- endif -%}
+          {%- if collection.image.width >= 360 -%}{{ collection.image | image_url: width: 360 }} 360w,{%- endif -%}
+          {%- if collection.image.width >= 535 -%}{{ collection.image | image_url: width: 535 }} 535w,{%- endif -%}
+          {%- if collection.image.width >= 750 -%}{{ collection.image | image_url: width: 750 }} 750w,{%- endif -%}
+          {%- if collection.image.width >= 1070 -%}{{ collection.image | image_url: width: 1070 }} 1070w,{%- endif -%}
+          {%- if collection.image.width >= 1500 -%}{{ collection.image | image_url: width: 1500 }} 1500w,{%- endif -%}
+          {{ collection.image | image_url }} {{ collection.image.width }}w
+        "
+        src="{{ collection.image | image_url: width: 750 }}"
+        sizes="(min-width: {{ settings.page_width }}px) {{ settings.page_width | minus: 100 | divided_by: 2 }}px, (min-width: 750px) calc(50vw - 130px), calc(50vw - 55px)"
+        alt="{{ collection.image.alt | escape }}"
+        width="{{ collection.image.width }}"
+        height="{{ collection.image.height }}"
+      >
+    </div>
+  {%- endif -%}
 </div>
 
 {% schema %}

@@ -34,7 +34,7 @@
         data-type: 'add-to-cart-form'
       -%}
         <input
-          type="hidden"
+          type=""
           name="id"
           value="{{ product.selected_or_first_available_variant.id }}"
           {% if product.selected_or_first_available_variant.available == false
@@ -84,6 +84,7 @@
             </span>
             {%- render 'loading-spinner' -%}
           </button>
+
           {%- if show_dynamic_checkout -%}
             <div x-data>
               <button
@@ -117,8 +118,6 @@
   {%- endif -%}
 
   {%- if show_pickup_availability -%}
-    {{ 'component-pickup-availability.css' | asset_url | stylesheet_tag }}
-
     {%- assign pick_up_availabilities = product.selected_or_first_available_variant.store_availabilities
       | where: 'pick_up_enabled', true
     -%}

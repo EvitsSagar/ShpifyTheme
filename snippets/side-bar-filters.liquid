@@ -1,0 +1,365 @@
+<div
+  id="upatedSideFilterBar"
+  x-data="
+    {
+      loading: false,
+    }
+  "
+  @filter-updated.window="
+    $nextTick(() => {
+      let queryString = new URLSearchParams(new FormData($refs.filter_form)).toString()
+      if($event.detail.filterType==='checkbox'){
+        const filters = queryString.split('&');
+        const updatedFilters = filters.filter(filter =>
+          !filter.startsWith('filter.v.price.')
+        );
+       let newQueryString = updatedFilters.join('&');
+        queryString=newQueryString
+      }
+      loading = true;
+      fetch('/collections/{{ collection.handle }}?' + queryString)
+        .then(response => response.text())
+        .then(data => {
+          let html_div = document.createElement('div');
+          html_div.innerHTML = data;
+          let html_dom = html_div.querySelector('#CollectionProducts').innerHTML;
+          document.querySelector('#CollectionProducts').innerHTML = html_dom;
+
+          let updatedFilters = html_div.querySelector('#CollectionFilterView').innerHTML;
+          document.querySelector('#CollectionFilterView').innerHTML = updatedFilters;
+
+          // update url without refreshing the page
+          history.replaceState(null, null, '?' + queryString);
+        })
+        .catch(error => console.error('Error:', error))
+        .finally(() => loading = false);
+    })
+  "
+  class="p-4"
+>
+  {% render 'On-page-loader' %}
+  <h3 class="font-sans font-semibold text-3xl border-b-2 border-gray-300 mb-4 shadow-inner p-4">Filters</h3>
+  <form x-ref="filter_form" id="FilterSideBar">
+    {%- for filter in collection.filters -%}
+      <div x-data="{ open: false }" class="question border-b border-grey-lighter">
+        <a
+          href="#"
+          @click="open = !open"
+          class="py-4 px-2 flex items-center font-bold w-full text-left justify-between hover:bg-gray-200 "
+        >
+          <div>
+            <span>{{ filter.label }}</span>
+            {%- if filter.active_values.size > 0 -%}
+              <span>({{ filter.active_values.size }})</span>
+            {%- endif -%}
+          </div>
+          <svg
+            :class="{ 'rotate-90': open, 'rotate-0': !open }"
+            class="transition-transform duration-200"
+            xmlns="http://www.w3.org/2000/svg"
+            height="24px"
+            viewBox="0 -960 960 960"
+            width="24px"
+            fill="currentcolor"
+          >
+            <path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/>
+          </svg>
+        </a>
+
+        <div
+          x-show="open"
+          x-transition:enter="transition ease-out duration-500"
+          x-transition:enter-start="opacity-0 transform -translate-y-2"
+          x-transition:enter-end="opacity-100 transform translate-y-0"
+          x-transition:leave="transition ease-in duration-500"
+          x-transition:leave-start="opacity-100 transform translate-y-0"
+          x-transition:leave-end="opacity-0 transform -translate-y-2"
+          class="leading-normal text-md px-4 mb-4"
+        >
+          <div class="">
+            <p class="">
+              <span class="font-sans font-semibold"> selected </span>
+              {{ filter.active_values.size }}
+            </p>
+            {%- if filter.active_values.size > 0 -%}
+              <p><a href="{{ filter.url_to_remove }}">Reset</a></p>
+            {%- endif -%}
+          </div>
+          {%- case filter.type -%}
+            {%- when 'boolean' -%}
+              <ul
+                class="my-2 font-medium text-gray-900 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              >
+                <li class="w-full border-b border-gray-200 rounded-t-lg dark:border-gray-600 ">
+                  <div class="flex items-center ps-3 cursor-pointer">
+                    <input
+                      @change="$dispatch('filter-updated',{ filterType: 'checkbox'})"
+                      class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                      type="checkbox"
+                      name="{{ filter.param_name }}"
+                      value="{{ filter.true_value.value }}"
+                      id="Filter-{{ filter.param_name }}"
+                      {% if filter.true_value.active -%}
+                        checked
+                      {%- endif %}
+                      {% if filter.true_value.count == 0 and filter.true_value.active == false -%}
+                        disabled
+                      {%- endif -%}
+                    >
+                    <label
+                      class="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                      for="Filter-{{ filter.param_name }}-{{ filter.true_value.value }}"
+                    >
+                      {{- filter.true_value.label -}}
+                    </label>
+                  </div>
+                </li>
+                <li class="w-full border-b border-gray-200 rounded-t-lg dark:border-gray-600">
+                  <div class="flex items-center ps-3">
+                    <input
+                      class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                      type="checkbox"
+                      @change="$dispatch('filter-updated',{ filterType: 'checkbox'})"
+                      name="{{ filter.param_name }}"
+                      value="{{ filter.false_value.value }}"
+                      id="Filter-{{ filter.param_name }}"
+                      {% if filter.false_value.active -%}
+                        checked
+                      {%- endif %}
+                      {% if filter.false_value.count == 0 and filter.false_value.active == false -%}
+                        disabled
+                      {%- endif %}
+                    >
+                    <label
+                      class="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                      for="Filter-{{ filter.param_name }}-{{ filter.false_value.value }}"
+                    >
+                      {{- filter.false_value.label -}}
+                    </label>
+                  </div>
+                </li>
+              </ul>
+
+            {%- when 'list' -%}
+              <ul class="my-2 font-medium text-gray-900 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                {%- for filter_value in filter.values -%}
+                  <li class="w-full border-b border-gray-200 rounded-t-lg dark:border-gray-600 ">
+                    <div class="flex items-center ps-3 cursor-pointer">
+                      <input
+                        @change="$dispatch('filter-updated',{ filterType: 'checkbox'})"
+                        class="w-6 h-6 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                        type="checkbox"
+                        name="{{ filter_value.param_name }}"
+                        value="{{ filter_value.value }}"
+                        id="Filter-{{ filter.param_name }}-{{ forloop.index }}"
+                        {% if filter_value.active -%}
+                          checked
+                        {%- endif %}
+                        {% if filter_value.count == 0 and filter_value.active == false -%}
+                          disabled
+                        {%- endif %}
+                      >
+                      <label
+                        class="w-full py-3 ms-2 font-medium text-gray-900 dark:text-gray-300"
+                        for="Filter-{{ filter.param_name }}-{{ forloop.index }}"
+                      >
+                        <span>
+                          {%- case filter_value.display.type -%}
+                            {%- when 'colors' -%}
+                              {% liquid
+                                assign size_limit = filter_value.display.value.size | at_most: 4
+                                assign rotation = '0deg'
+                                if size_limit == 2
+                                  assign rotation = '45deg'
+                                endif
+
+                                assign angle_increment = 360 | divided_by: size_limit
+                                assign angle = 0
+                              %}
+                              {%- capture conic_gradient -%}
+                                    {%- for color in filter_value.display.value limit: size_limit -%}
+                                      {{ color }} {{ angle }}deg{%- assign angle = angle | plus: angle_increment %} {{ angle }}deg{%- unless forloop.last %}, {%- endunless -%}
+                                    {%- endfor -%}
+                                  {%- endcapture -%}
+                              <span
+                                style="
+                                  width: 25px;
+                                  height: 25px;
+                                  border-radius: 50%;
+                                  display: flex;
+                                  justify-content: center;
+                                  align-items: center;
+                                  background: conic-gradient({{ conic_gradient }}); transform: rotateZ({{ rotation }});
+                                "
+                              ></span>
+                            {%- when 'image' -%}
+                              {{
+                                filter_value.display.value
+                                | image_url: width: 25
+                                | image_tag: alt: filter_value.display.value.alt
+                              }}
+                            {%- else -%}
+                              <span class="visual-display__child"></span>
+                          {%- endcase -%}
+                        </span>
+                        {{ filter_value.label }}
+                      </label>
+                    </div>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            {%- when 'price_range' -%}
+              {%- assign max_default = filter.range_max | money_without_currency | replace: ',', '' -%}
+              {%- assign max_sel_value = filter.max_value.value | money_without_currency | replace: ',', '' -%}
+              {%- assign min_sel_value = filter.min_value.value | money_without_currency | replace: ',', '' -%}
+              <div
+                x-data="
+                  function range() {
+                      return {
+                        minprice: {{ min_sel_value | default: 0 }},
+                        maxprice: {{ max_sel_value | default: max_default }},
+                        min:0,
+                        max: {{ max_default }},
+                        minthumb: 0,
+                        maxthumb: 0,
+
+                        mintrigger() {
+                          this.minprice = Math.min(this.minprice, this.maxprice - 500);
+                          this.minthumb = ((this.minprice - this.min) / (this.max - this.min)) * 100;
+                        },
+
+                        maxtrigger() {
+                          this.maxprice = Math.max(this.maxprice, this.minprice + 500);
+                          this.maxthumb = 100 - (((this.maxprice - this.min) / (this.max - this.min)) * 100);
+                        },
+                      }
+                  }
+                "
+                x-init="mintrigger(); maxtrigger()"
+              >
+                <div class="flex justify-center items-center py-10">
+                  <div
+                    class="relative max-w-xl w-full"
+                  >
+                    <div>
+                      <input
+                        type="range"
+                        step="100"
+                        @change="$dispatch('filter-updated')"
+                        x-bind:min="min"
+                        x-bind:max="max"
+                        x-on:input="mintrigger"
+                        x-model="minprice"
+                        class="absolute pointer-events-none appearance-none z-20 h-2 w-full opacity-0 cursor-pointer [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:appearance-none"
+                      >
+
+                      <input
+                        type="range"
+                        step="100"
+                        @change="$dispatch('filter-updated')"
+                        x-bind:min="min"
+                        x-bind:max="max"
+                        x-on:input="maxtrigger"
+                        x-model="maxprice"
+                        class="absolute pointer-events-none appearance-none z-20 h-2 w-full opacity-0 cursor-pointer [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:appearance-none"
+                      >
+
+                      <div class="relative z-10 h-2">
+                        <div class="absolute z-10 left-0 right-0 bottom-0 top-0 rounded-md bg-gray-200"></div>
+
+                        <div
+                          class="absolute z-20 top-0 bottom-0 rounded-md bg-green-300"
+                          x-bind:style="'right:'+maxthumb+'%; left:'+minthumb+'%'"
+                        ></div>
+
+                        <div
+                          class="absolute z-30 w-6 h-6 top-0 left-0 bg-green-300 rounded-full -mt-2 -ml-1"
+                          x-bind:style="'left: '+minthumb+'%'"
+                        ></div>
+
+                        <div
+                          class="absolute z-30 w-6 h-6 top-0 right-0 bg-green-300 rounded-full -mt-2 -mr-3"
+                          x-bind:style="'right: '+maxthumb+'%'"
+                        ></div>
+                      </div>
+                    </div>
+
+                    {% comment %}
+                      <div class="flex justify-between items-center py-5">
+                        <div>
+                          <input
+                            type="text"
+                            maxlength="5"
+                            x-on:input="mintrigger"
+                            x-model="minprice"
+                            class="px-3 py-2 border border-gray-200 rounded w-24 text-center"
+                          >
+                        </div>
+                        <div>
+                          <input
+                            type="text"
+                            maxlength="5"
+                            x-on:input="maxtrigger"
+                            x-model="maxprice"
+                            class="px-3 py-2 border border-gray-200 rounded w-24 text-center"
+                          >
+                        </div>
+                      </div>
+                    {% endcomment %}
+                  </div>
+                </div>
+                <div class="flex items-center space-x-4 justify-center">
+                  <div class="bg-gray-50 px-4 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                    <span>{{ cart.currency.symbol }}</span>
+                    <input
+                      x-on:input="mintrigger"
+                      x-model="minprice"
+                      class="py-2"
+                      @change="$dispatch('filter-updated')"
+                      name="{{ filter.min_value.param_name }}"
+                      id="Filter-{{ filter.min_value.param_name }}"
+                      {% if filter.min_value.value -%}
+                        value="{{ filter.min_value.value | money_without_currency | replace: ',', '' }}"
+                      {%- endif %}
+                      type="number"
+                      placeholder="0"
+                      min="0"
+                      max="{{ filter.range_max | money_without_currency | replace: ',', '' }}"
+                    >
+                    {% comment %} <label for="Filter-{{ filter.min_value.param_name }}">From</label> {% endcomment %}
+                  </div>
+                  <div>
+                    <label for="Filter-{{ filter.max_value.param_name }}">To</label>
+                  </div>
+                  <div class="bg-gray-50 px-4 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                    <span>{{ cart.currency.symbol }}</span>
+
+                    <input
+                      x-on:input="maxtrigger"
+                      x-model="maxprice"
+                      class="py-2"
+                      @change="$dispatch('filter-updated')"
+                      name="{{ filter.max_value.param_name }}"
+                      id="Filter-{{ filter.max_value.param_name }}"
+                      {% if filter.max_value.value -%}
+                        value="{{ filter.max_value.value | money_without_currency | replace: ',', '' }}"
+                      {%- endif %}
+                      type="number"
+                      placeholder="{{ filter.range_max | money_without_currency | replace: ',', '' }}"
+                      min="0"
+                      max="{{ filter.range_max | money_without_currency | replace: ',', '' }}"
+                    >
+                  </div>
+                </div>
+              </div>
+              {% comment %}
+                <div class="filter-group-display__submit">
+                  <input type="submit" value="Apply">
+                </div>
+              {% endcomment %}
+          {%- endcase -%}
+        </div>
+      </div>
+    {%- endfor -%}
+  </form>
+</div>

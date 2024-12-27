@@ -6,8 +6,20 @@
     {%- assign first_value = option.values[0] -%}
     <div
       class="text-center w-full flex flex-wrap justify-start"
-      x-data="{ selectedOptions: { '{{ option.name }}': '{{ first_value | escape }}' } }"
+      x-data="
+        { selectedOptions: { '{{ option.name }}':'{{ first_value | escape }}' },
+           productVariants: {{ product_variants | json }},
+           getSelectedVariantId() {
+             const selectedValues = Object.values(this.selectedOptions);
+             const matchingVariant = this.productVariants.find(variant =>
+               variant.options.every((optionValue, index) => optionValue === selectedValues[index])
+             );
+             return matchingVariant ? matchingVariant.id : null;
+           }
+        }
+      "
     >
+      <button @click="console.log(JSON.stringify($data))">Log x-data</button>
       {%- for option_value in option.values -%}
         <label class="cursor-pointer m-2" for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}">
           <input
@@ -45,21 +57,15 @@
             {% if name == 'size' %}
               {{ option_value }}
             {% endif %}
-
-            {% comment %}
-              <div class="hobbies-icon">
-                <img
-                  src="https://img.freepik.com/free-vector/hand-drawn-twerk-illustration_23-2149447957.jpg?size=626&ext=jpg"
-                  class="w-36 mx-auto mb-4"
-                >
-                <h3 class="text-gray-600 font-light uppercase tracking-wide text-lg">Music</h3>
-              </div>
-            {% endcomment %}
           </span>
         </label>
       {%- endfor -%}
     </div>
   {%- endfor -%}
+
+  <div class="mt-4">
+    <p>Selected Variant ID: <span x-text="getSelectedVariantId()"></span></p>
+  </div>
 {%- endunless -%}
 
 {% comment %}
