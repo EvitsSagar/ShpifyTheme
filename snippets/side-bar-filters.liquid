@@ -77,12 +77,22 @@
           class="leading-normal text-md px-4 mb-4"
         >
           <div class="">
-            <p class="">
-              <span class="font-sans font-semibold"> selected </span>
-              {{ filter.active_values.size }}
-            </p>
+            {% comment %}
+              <p class="">
+                <span id="filterSelected" class="font-sans font-semibold"> selected </span>
+                {{ filter.active_values.size }}
+              </p>
+            {% endcomment %}
             {%- if filter.active_values.size > 0 -%}
-              <p><a href="{{ filter.url_to_remove }}">Reset</a></p>
+              {% comment %}
+                <p>
+                  <a
+                    class="px-5 py-3 text-base font-medium text-center inline-flex items-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    href="{{ filter.url_to_remove }}"
+                    >Reset</a
+                  >
+                </p>
+              {% endcomment %}
             {%- endif -%}
           </div>
           {%- case filter.type -%}

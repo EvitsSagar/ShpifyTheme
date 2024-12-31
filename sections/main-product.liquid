@@ -291,12 +291,14 @@
                   schema_setting: section.settings.pick_selection_color
                 %}
 
-                {% render 'testVarientPic',
-                  product: product,
-                  block: block,
-                  product_form_id: product_form_id,
-                  schema_setting: section.settings.pick_selection_color
-                %}
+                {% comment %}
+                  {% render 'testVarientPic',
+                    product: product,
+                    block: block,
+                    product_form_id: product_form_id,
+                    schema_setting: section.settings.pick_selection_color
+                  %}
+                {% endcomment %}
 
               {%- when 'buy_buttons' -%}
                 {%- render 'buy-buttons',

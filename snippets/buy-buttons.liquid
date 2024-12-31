@@ -1,4 +1,5 @@
 <div
+  id="BuyButton"
   {{ block.shopify_attributes }}
 >
   {%- if product != blank -%}
@@ -34,8 +35,9 @@
         data-type: 'add-to-cart-form'
       -%}
         <input
-          type=""
+          type="hidden"
           name="id"
+          id="varientIdHandler"
           value="{{ product.selected_or_first_available_variant.id }}"
           {% if product.selected_or_first_available_variant.available == false
             or quantity_rule_soldout

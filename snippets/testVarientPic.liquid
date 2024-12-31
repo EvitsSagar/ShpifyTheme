@@ -2,20 +2,38 @@
   <form method="post" action="/cart/add" class="space-y-4">
     <input type="hidden" name="id" x-model="selectedVariantId">
 
-    <!-- Variant Options -->
     {% for option in product.options_with_values %}
+      {%- assign name = option.name | downcase -%}
       <div class="variant-picker space-y-3">
         <h3 class="text-sm font-medium text-gray-700">{{ option.name }}</h3>
         <div class="flex flex-wrap gap-2">
           {% for value in option.values %}
-            <button
-              type="button"
-              class="variant-button px-4 py-2 border rounded-md text-sm text-gray-700 hover:bg-gray-100 focus:ring focus:ring-indigo-500"
-              :class="selectedOptions[{{ option.position }}] === '{{ value }}' ? 'bg-indigo-600 text-white' : ''"
-              @click="selectOption({{ option.position }}, '{{ value }}')"
-            >
-              {{ value }}
-            </button>
+            <label class="cursor-pointer m-2">
+              <input
+                type="radio"
+                name="option-{{ option.position }}"
+                class="hidden"
+                :value="'{{ value }}'"
+                :checked="selectedOptions[{{ option.position }}] === '{{ value }}'"
+                @change="selectOption({{ option.position }}, '{{ value }}')"
+              >
+              <span
+                class="radio-btn relative inline-block items-center rounded-full border-2 shadow-md w-fit transition-all ease-in-out duration-500 {% if name == 'color' %} h-full py-6 px-8{% else %} px-[6px] py-[3px] min-w-14{% endif %}"
+                style="{% if name == 'color' %} background-color: {{ value }} {% endif %} ; borderColor: selectedOptions['{{ option.position }}'] === '{{ value  }}' ? {{ schema_setting }} : transparent"
+              >
+                <i
+                  style="background-color:{{ schema_setting }}"
+                  class="checkmark absolute text-white text-lg top-[-15px] left-1/2 transform -translate-x-1/2 scale-150 rounded-full  transition-all duration-500 pointer-events-none px-2 py-0.5 "
+                  :class="{ 'opacity-100 scale-100': selectedOptions['{{ option.position}}'] === '{{ value  }}', 'opacity-0 scale-150': selectedOptions['{{ option.position }}'] !== '{{ value }}'}"
+                  >✔</i
+                >
+                {% if name == 'size' %}
+                  <div class="flex items-center justify-center">
+                    {{ value }}
+                  </div>
+                {% endif %}
+              </span>
+            </label>
           {% endfor %}
         </div>
       </div>
@@ -43,122 +61,71 @@
   </form>
 </div>
 
-<script>
-    function variantPicker() {
-        return {
-          variants: {{ product.variants | json }}, // All product variants
-          selectedOptions: {}, // Selected options for each variant
-          selectedVariantId: null, // Selected variant ID
-      
-          init() {
-            // Preselect variant based on URL or default to the first available variant
-            const urlParams = new URLSearchParams(window.location.search);
-            const variantIdFromUrl = urlParams.get("variant");
-      
-            if (variantIdFromUrl) {
-              const matchedVariant = this.variants.find(
-                (variant) => variant.id.toString() === variantIdFromUrl
-              );
-              if (matchedVariant) {
-                this.setVariantOptions(matchedVariant);
-              }
-            } else {
-              const defaultVariant = this.variants.find((variant) => variant.available);
-              if (defaultVariant) {
-                this.setVariantOptions(defaultVariant);
-              }
-            }
-          },
-      
-          setVariantOptions(variant) {
-            variant.options.forEach((value, index) => {
-              this.selectedOptions[index + 1] = value;
-            });
-            this.updateSelectedVariant();
-          },
-      
-          selectOption(optionPosition, value) {
-            this.selectedOptions[optionPosition] = value;
-            this.updateSelectedVariant();
-          },
-      
-          updateSelectedVariant() {
-            const matchedVariant = this.variants.find((variant) =>
-              variant.options.every((option, index) => option === this.selectedOptions[index + 1])
-            );
-      
-            if (matchedVariant && matchedVariant.available) {
-              this.selectedVariantId = matchedVariant.id;
-      
-              // Update the URL
-              const newUrl = new URL(window.location);
-              newUrl.searchParams.set("variant", matchedVariant.id);
-              window.history.replaceState(null, "", newUrl);
-            } else {
-              this.selectedVariantId = null;
-            }
-          },
-      
-          buyNow() {
-            if (this.selectedVariantId) {
-              // Redirect to checkout with the selected variant
-              window.location.href = `/checkout?variants[]=${this.selectedVariantId}&quantity=1`;
-            }
-          },
-        };
-      }
-</script>
-
 {% comment %}
   <script>
     function variantPicker() {
-        return {
-          variants: {{ product.variants | json }}, // All product variants
-          selectedOptions: {}, // Selected options for each variant
-          selectedVariantId: null, // Selected variant ID
+      return {
+        variants: {{ product.variants | json }},
+        selectedOptions: {},
+        selectedVariantId: null,
 
-          init() {
-            // Preselect variant based on URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const variantIdFromUrl = urlParams.get("variant");
+        console.log(selectedOptions,"[[[]]]")
 
-            if (variantIdFromUrl) {
-              const matchedVariant = this.variants.find(
-                (variant) => variant.id.toString() === variantIdFromUrl
-              );
-              if (matchedVariant) {
-                matchedVariant.options.forEach((value, index) => {
-                  this.selectedOptions[index + 1] = value;
-                });
-                this.updateSelectedVariant();
-              }
-            }
-          },
+        init() {
+          const urlParams = new URLSearchParams(window.location.search);
+          const variantIdFromUrl = urlParams.get("variant");
 
-          selectOption(optionPosition, value) {
-            // Update selected option
-            this.selectedOptions[optionPosition] = value;
-            this.updateSelectedVariant();
-          },
-
-          updateSelectedVariant() {
-            // Match the selected variant based on options
-            const matchedVariant = this.variants.find((variant) =>
-              variant.options.every((option, index) => option === this.selectedOptions[index + 1])
+          if (variantIdFromUrl) {
+            const matchedVariant = this.variants.find(
+              (variant) => variant.id.toString() === variantIdFromUrl
             );
-
-            if (matchedVariant && matchedVariant.available) {
-              this.selectedVariantId = matchedVariant.id;
-
-              // Update the URL
-              const newUrl = new URL(window.location);
-              newUrl.searchParams.set("variant", matchedVariant.id);
-              window.history.replaceState(null, "", newUrl);
-            } else {
-              this.selectedVariantId = null;
+            if (matchedVariant) {
+              this.setVariantOptions(matchedVariant);
             }
-          },
-        };
-      }
+          } else {
+            const defaultVariant = this.variants.find((variant) => variant.available);
+            if (defaultVariant) {
+              this.setVariantOptions(defaultVariant);
+            }
+          }
+        },
+
+        setVariantOptions(variant) {
+          variant.options.forEach((value, index) => {
+            this.selectedOptions[index + 1] = value;
+          });
+          this.updateSelectedVariant();
+        },
+
+        selectOption(optionPosition, value) {
+          this.selectedOptions[optionPosition] = value;
+          this.updateSelectedVariant();
+        },
+
+        updateSelectedVariant() {
+          const matchedVariant = this.variants.find((variant) =>
+            variant.options.every((option, index) => option === this.selectedOptions[index + 1])
+          );
+
+          if (matchedVariant && matchedVariant.available) {
+            this.selectedVariantId = matchedVariant.id;
+
+            // Update the URL
+            const newUrl = new URL(window.location);
+            newUrl.searchParams.set("variant", matchedVariant.id);
+            window.history.replaceState(null, "", newUrl);
+          } else {
+            this.selectedVariantId = null;
+          }
+        },
+
+        buyNow() {
+          if (this.selectedVariantId) {
+            // Redirect to checkout with the selected variant
+            window.location.href = `/checkout?variants[]=${this.selectedVariantId}&quantity=1`;
+          }
+        },
+      };
+    }
   </script>
 {% endcomment %}

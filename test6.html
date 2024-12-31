@@ -11,38 +11,24 @@
 <body class="flex items-center justify-center h-screen">
 
 
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alpine.js Dispatch Example</title>
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.15.0/dist/cdn.min.js" defer></script>
-  </head>
-  <body>
-    <div x-data>
-      <select 
-        @change="$dispatch('filter-updated', { filterType: 'test699', selectedValue: this.value })"
-      >
-        <option value="">Select</option>
-        <option value="option1">Option 1</option>
-        <option value="option2">Option 2</option>
-      </select>
+  <div x-data="{ 
+    items: [{ id: 1, name: 'Item 1' }, { id: 2, name: 'Item 2' }],
+    foundItem: null,
+    updateSelectedVariant() {
+        this.foundItem = this.items.find(item => item.id === 2); // Update the reactive foundItem
+        console.log(this.foundItem, 'iki');
+    }
+}">
+    <button @click="updateSelectedVariant()">Find Item 2</button>
+
+    <div x-show="foundItem">
+        <p>Found: <span x-text="foundItem.name"></span></p>
     </div>
-  
-    <div x-data @filter-updated.window="console.log('Filter Type:', $event.detail.filterType, 'Selected Value:', $event.detail.selectedValue)">
-      <p>Check the console for dispatched event data.</p>
-    </div>
-  </body>
-  </html>
-  
-  
-    
-  
-  
+</div>
+
 
   
-
+  
   <!-- <div x-data="{ selected: '', labelFocused: false }" class="relative w-64">
     <label 
       :class="{
