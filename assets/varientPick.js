@@ -1,19 +1,17 @@
 
-  function variantPicker() {
-
+  function variantPicker(Varient_json) {
     return {
-      variants: {{ product.variants | json }},
+      variants: Varient_json,
       selectedOptions: {},
       selectedVariantId: null,
 
-      init() {
+      updateUrl(variantsList) {
         const urlParams = new URLSearchParams(window.location.search);
-        const variantIdFromUrl = urlParams.get("variant");
+        const variantIdFromUrl = urlParams.get('variant');
 
         if (variantIdFromUrl) {
-          const matchedVariant = this.variants.find(
-            (variant) => variant.id.toString() === variantIdFromUrl
-          );
+          const matchedVariant = this.variants.find((variant) => variant.id.toString() === variantIdFromUrl);
+
           if (matchedVariant) {
             this.setVariantOptions(matchedVariant);
           }
@@ -35,26 +33,23 @@
       selectOption(optionPosition, value) {
         this.selectedOptions[optionPosition] = value;
         this.updateSelectedVariant();
+        this.updateUrl();
       },
 
-      
       updateSelectedVariant() {
         const matchedVariant = this.variants.find((variant) =>
           variant.options.every((option, index) => option === this.selectedOptions[index + 1])
         );
 
-
-
         if (matchedVariant && matchedVariant.available) {
           this.selectedVariantId = matchedVariant.id;
           const newUrl = new URL(window.location);
-          newUrl.searchParams.set("variant", matchedVariant.id);
-          window.history.replaceState(null, "", newUrl);
-          document.querySelector('#varientIdHandler').value = matchedVariant.id
+          newUrl.searchParams.set('variant', matchedVariant.id);
+          window.history.replaceState(null, '', newUrl);
+          document.querySelector('#varientIdHandler').value = matchedVariant.id;
         } else {
           this.selectedVariantId = null;
         }
       },
-
     };
   }

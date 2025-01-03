@@ -85,12 +85,12 @@
                   {%- render '_price_element.liquid', product: product, class: 'text-2xl font-semibold' -%}
                 </div>
                 {%- if product.quantity_price_breaks_configured? -%}
-                  <div class="">
+                  <div class="xyz">
                     <span>{{ 'products.product.volume_pricing.note' | t }}</span>
                   </div>
                 {%- endif -%}
                 {%- if cart.taxes_included or cart.duties_included or shop.shipping_policy.body != blank -%}
-                  <div class="">
+                  <div class="xyz2">
                     {%- if cart.duties_included and cart.taxes_included -%}
                       {{ 'products.product.duties_and_taxes_included' | t }}
                     {%- elsif cart.taxes_included -%}

@@ -11,21 +11,24 @@
 <body class="flex items-center justify-center h-screen">
 
 
-  <div x-data="{ 
-    items: [{ id: 1, name: 'Item 1' }, { id: 2, name: 'Item 2' }],
-    foundItem: null,
-    updateSelectedVariant() {
-        this.foundItem = this.items.find(item => item.id === 2); // Update the reactive foundItem
-        console.log(this.foundItem, 'iki');
-    }
-}">
-    <button @click="updateSelectedVariant()">Find Item 2</button>
-
-    <div x-show="foundItem">
-        <p>Found: <span x-text="foundItem.name"></span></p>
-    </div>
-</div>
-
+  <span 
+  class="radio-btn relative inline-block items-center rounded-full border-2 shadow-md w-fit transition-all ease-in-out duration-500 px-[6px] py-[3px] min-w-14 opacity-50 pointer-events-none">
+  
+  <!-- Cross line -->
+  <span 
+    class="absolute top-1/2 left-0 w-full h-[2px] bg-black transform -translate-y-1/2 rotate-45 origin-center"></span>
+  
+  <i 
+    style="background-color:#90CAF9" 
+    class="checkmark absolute text-white text-lg top-[-15px] left-1/2 transform -translate-x-1/2 scale-150 rounded-full transition-all duration-500 pointer-events-none px-2 py-0.5 opacity-0">
+    ✔
+  </i>
+  
+  <div class="flex items-center justify-center">
+    9
+  </div>
+  
+</span>
 
   
   

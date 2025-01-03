@@ -252,6 +252,7 @@
     {{ 'app.css' | asset_url | stylesheet_tag: preload: true }}
     <script src="{{ 'global.js' | asset_url }}" async rel="preload" as="script"></script>
     <script src="{{ 'app.js' | asset_url }}" async rel="preload" as="script"></script>
+    {% comment %} <script src="{{ 'varientPick.js' | asset_url }}" defer rel="preload" as="script"></script> {% endcomment %}
 
     <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" onload="this.media='all'">
 

@@ -47,7 +47,6 @@
           {% endif %}
           class="product-variant-id"
         >
-
         <input type="hidden" id="quantityHandler" name="quantity" value="1">
         {%- if gift_card_recipient_feature_active -%}
           {%- render 'gift-card-recipient-form', product: product, form: form, section: section -%}
@@ -67,12 +66,17 @@
             id="ProductSubmitButton-{{ section_id }}"
             type="submit"
             name="add"
+            {% if product.selected_or_first_available_variant.available == false
+              or quantity_rule_soldout
+              or product.selected_or_first_available_variant == null
+            %}
+              disabled style="pointer-events: none; opacity: 0.5;"
+            {% endif %}
             class="bg-teal-100 hover:bg-[#A1EEBD] text-teal-800 py-3 px-8 shadow-md hover:shadow-2xl transition duration-500"
             {% if product.selected_or_first_available_variant.available == false
               or quantity_rule_soldout
               or product.selected_or_first_available_variant == null
             %}
-              disabled
             {% endif %}
           >
             <span>
@@ -90,6 +94,12 @@
           {%- if show_dynamic_checkout -%}
             <div x-data>
               <button
+                {% if product.selected_or_first_available_variant.available == false
+                  or quantity_rule_soldout
+                  or product.selected_or_first_available_variant == null
+                %}
+                  disabled style="pointer-events: none; opacity: 0.5;"
+                {% endif %}
                 @click="document.querySelector('.shopify-payment-button__button').click()"
                 type="button"
                 class="bg-teal-100 hover:bg-[#A1EEBD] text-teal-800 py-3 px-8 shadow-md hover:shadow-2xl transition duration-500 w-full"

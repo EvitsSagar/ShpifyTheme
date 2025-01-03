@@ -1,107 +1,41 @@
-{% comment %}
-  {%- unless product.has_only_default_variant -%}
-    {%- for option in product.options_with_values -%}
-      <h1 class="font-sans font-bold">{{ option.name }}</h1>
-      {%- assign name = option.name | downcase -%}
-      {%- assign varient = product.variants | json -%}
-      {% assign polina_products = product.variants | where: 'id', 45741972750556 | json %}
-      <pre>{{ polina_products }}</pre>
-      <div
-        x-data="
-          {
-              items: {{ polina_products }},
-              foundItem: null,
-              updateSelectedVariant() {
-                  this.foundItem = this.items.find(item => item.id === 45741972750556 );
-                  console.log(this.items, 'iki');
-              }
-          }
-        "
-        class="text-center w-full flex flex-wrap justify-start"
+{%- unless product.has_only_default_variant -%}
+  {%- for option in product.options_with_values -%}
+    <h1 class="font-sans font-bold">{{ option.name }}</h1>
+    {%- assign name = option.name | downcase -%}
 
-        x-init="$nextTick(updateSelectedVariant())"
-      >
-        {%- for value in option.values -%}
-          <label class="cursor-pointer m-2">
-            <input
-              type="radio"
-              name="option-{{ option.position }}"
-              class="hidden"
-              :value="'{{ value }}'"
-              :checked="selectedOptions[{{ option.position }}] === '{{ value }}'"
-              @change="selectOption({{ option.position }}, '{{ value }}')"
-            >
-            <span
-              class="radio-btn relative inline-block items-center rounded-full border-2 shadow-md w-fit transition-all ease-in-out duration-500 {% if name == 'color' %} h-full py-6 px-8{% else %} px-[6px] py-[3px] min-w-14{% endif %}"
-              style="{% if name == 'color' %} background-color: {{ value }} {% endif %} ; borderColor: selectedOptions['{{ option.position }}'] === '{{ value  }}' ? {{ schema_setting }} : transparent"
-            >
-              <i
-                style="background-color:{{ schema_setting }}"
-                class="checkmark absolute text-white text-lg top-[-15px] left-1/2 transform -translate-x-1/2 scale-150 rounded-full  transition-all duration-500 pointer-events-none px-2 py-0.5 "
-                :class="{ 'opacity-100 scale-100': selectedOptions['{{ option.position}}'] === '{{ value  }}', 'opacity-0 scale-150': selectedOptions['{{ option.position }}'] !== '{{ value }}'}"
-                >✔</i
-              >
-              {% if name == 'size' %}
-                <div class="flex items-center justify-center">
-                  {{ value }}
-                </div>
-              {% endif %}
-            </span>
-          </label>
-        {%- endfor -%}
-      </div>
-    {%- endfor -%}
-  {%- endunless -%}
-{% endcomment %}
-
-{% comment %}
-  <script>
-    function variantPicker(Varient_json) {
-
-      return {
-        variants: {{ product.variants | json }},
+    <div
+      class="text-center w-full flex flex-wrap justify-start"
+      x-data="
+        {
+        variants: {{ product.variants | json | escape }},
         selectedOptions: {},
         selectedVariantId: null,
 
-        updateUrl(variantsList) {
+        getAvailable(optionPosition, value) {
+        const testOptions = { ...this.selectedOptions, [optionPosition]: value };
+        const matchedVariant = this.variants.find((variant) =>
+          variant.options.every((option, index) => option === testOptions[index + 1])
+        );
+        return matchedVariant ? matchedVariant.available : false;
+        },
+
+        updateUrl() {
           const urlParams = new URLSearchParams(window.location.search);
           const variantIdFromUrl = urlParams.get('variant');
 
           if (variantIdFromUrl) {
-            const matchedVariant = this.variants.find(
-              (variant) => variant.id.toString() === variantIdFromUrl
-            );
+            const matchedVariant = this.variants.find((variant) => variant.id.toString() === variantIdFromUrl);
 
-            console.log(matchedVariant,"oopopop")
-            if (matchedVariant) {
+            if (matchedVariant.available) {
               this.setVariantOptions(matchedVariant);
             }
           } else {
             const defaultVariant = this.variants.find((variant) => variant.available);
-            if (defaultVariant) {
+            if (defaultVariant.available) {
               this.setVariantOptions(defaultVariant);
             }
           }
         },
-
-        {% comment %} init() {
-          const urlParams = new URLSearchParams(window.location.search);
-          const variantIdFromUrl = urlParams.get('variant');
-
-          if (variantIdFromUrl) {
-            const matchedVariant = this.variants.find(
-              (variant) => variant.id.toString() === variantIdFromUrl
-            );
-            if (matchedVariant) {
-              this.setVariantOptions(matchedVariant);
-            }
-          } else {
-            const defaultVariant = this.variants.find((variant) => variant.available);
-            if (defaultVariant) {
-              this.setVariantOptions(defaultVariant);
-            }
-          }
-        }, {% endcomment %}
 
         setVariantOptions(variant) {
           variant.options.forEach((value, index) => {
@@ -112,38 +46,33 @@
 
         selectOption(optionPosition, value) {
           this.selectedOptions[optionPosition] = value;
+          console.log(this.selectedOptions,'jkjjj')
           this.updateSelectedVariant();
-          this.updateUrl()
+          this.updateUrl();
         },
 
         updateSelectedVariant() {
+          console.log(this.selectedOptions,'mjjuuu')
           const matchedVariant = this.variants.find((variant) =>
-            variant.options.every((option, index) => option === this.selectedOptions[index + 1])
+            variant.options.every((option,index) => option === this.selectedOptions[index + 1])
           );
+
           if (matchedVariant && matchedVariant.available) {
             this.selectedVariantId = matchedVariant.id;
             const newUrl = new URL(window.location);
             newUrl.searchParams.set('variant', matchedVariant.id);
             window.history.replaceState(null, '', newUrl);
-            document.querySelector('#varientIdHandler').value = matchedVariant.id
+            document.querySelector('#varientIdHandler').value = matchedVariant.id;
           } else {
+            const newUrl = new URL(window.location);
+            newUrl.searchParams.delete('variant');
+            window.history.replaceState(null,'', newUrl);
             this.selectedVariantId = null;
           }
         },
+        }
+      "
 
-      };
-    }
-  </script>
-{% endcomment %}
-
-{%- unless product.has_only_default_variant -%}
-  {%- for option in product.options_with_values -%}
-    <h1 class="font-sans font-bold">{{ option.name }}</h1>
-    {%- assign name = option.name | downcase -%}
-
-    <div
-      class="text-center w-full flex flex-wrap justify-start"
-      x-data="variantPicker()"
       x-init="$nextTick(updateUrl())"
     >
       {%- for value in option.values -%}
@@ -152,14 +81,20 @@
             type="radio"
             name="option-{{ option.position }}"
             class="hidden"
+            :disabled="!getAvailable({{ option.position }}, '{{ value }}')"
             :value="'{{ value }}'"
             :checked="selectedOptions[{{ option.position }}] === '{{ value }}'"
             @change="selectOption({{ option.position }}, '{{ value }}')"
           >
           <span
             class="radio-btn relative inline-block items-center rounded-full border-2 shadow-md w-fit transition-all ease-in-out duration-500 {% if name == 'color' %} h-full py-6 px-8{% else %} px-[6px] py-[3px] min-w-14{% endif %}"
+            :class="{'cursor-not-allowed opacity-50':!getAvailable({{ option.position }}, '{{ value }}')}"
             style="{% if name == 'color' %} background-color: {{ value }} {% endif %} ; borderColor: selectedOptions['{{ option.position }}'] === '{{ value  }}' ? {{ schema_setting }} : transparent"
           >
+            <span
+              class="absolute top-1/2 left-0 w-full h-[2px] bg-black transform -translate-y-1/2 rotate-45 origin-center"
+              :class="{'hidden':getAvailable({{ option.position }}, '{{ value }}')}"
+            ></span>
             <i
               style="background-color:{{ schema_setting }}"
               class="checkmark absolute text-white text-lg top-[-15px] left-1/2 transform -translate-x-1/2 scale-150 rounded-full  transition-all duration-500 pointer-events-none px-2 py-0.5 "
@@ -177,86 +112,3 @@
     </div>
   {%- endfor -%}
 {%- endunless -%}
-
-<script>
-  function variantPicker(Varient_json) {
-
-    return {
-      variants: {{ product.variants | json }},
-      selectedOptions: {},
-      selectedVariantId: null,
-
-      updateUrl(variantsList) {
-        const urlParams = new URLSearchParams(window.location.search);
-        const variantIdFromUrl = urlParams.get('variant');
-
-        if (variantIdFromUrl) {
-          const matchedVariant = this.variants.find(
-            (variant) => variant.id.toString() === variantIdFromUrl
-          );
-
-          console.log(matchedVariant,"oopopop")
-          if (matchedVariant) {
-            this.setVariantOptions(matchedVariant);
-          }
-        } else {
-          const defaultVariant = this.variants.find((variant) => variant.available);
-          if (defaultVariant) {
-            this.setVariantOptions(defaultVariant);
-          }
-        }
-      },
-
-      {% comment %} init() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const variantIdFromUrl = urlParams.get('variant');
-
-        if (variantIdFromUrl) {
-          const matchedVariant = this.variants.find(
-            (variant) => variant.id.toString() === variantIdFromUrl
-          );
-          if (matchedVariant) {
-            this.setVariantOptions(matchedVariant);
-          }
-        } else {
-          const defaultVariant = this.variants.find((variant) => variant.available);
-          if (defaultVariant) {
-            this.setVariantOptions(defaultVariant);
-          }
-        }
-      }, {% endcomment %}
-
-      setVariantOptions(variant) {
-        variant.options.forEach((value, index) => {
-          this.selectedOptions[index + 1] = value;
-        });
-        this.updateSelectedVariant();
-      },
-
-      selectOption(optionPosition, value) {
-        this.selectedOptions[optionPosition] = value;
-        this.updateSelectedVariant();
-        this.updateUrl()
-      },
-
-      updateSelectedVariant() {
-        const matchedVariant = this.variants.find((variant) =>
-          variant.options.every((option, index) => option === this.selectedOptions[index + 1])
-        );
-
-
-
-        if (matchedVariant && matchedVariant.available) {
-          this.selectedVariantId = matchedVariant.id;
-          const newUrl = new URL(window.location);
-          newUrl.searchParams.set('variant', matchedVariant.id);
-          window.history.replaceState(null, '', newUrl);
-          document.querySelector('#varientIdHandler').value = matchedVariant.id
-        } else {
-          this.selectedVariantId = null;
-        }
-      },
-
-    };
-  }
-</script>

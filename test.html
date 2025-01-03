@@ -4,24 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <script>
-    function removePriceFilters(queryString) {
-  const filters = queryString.split('&');
-  const updatedFilters = filters.filter(filter => 
-    !filter.startsWith('filter.v.price.')
-  );
-  return updatedFilters.join('&');
-}
-
-
-const queryString = 'filter.v.availability=1&filter.v.availability=0&filter.v.price.gte=0&filter.v.price.lte=2629.95';
-const result = removePriceFilters(queryString);
-console.log(result); 
-
-
-  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <button onclick="()=>removePriceFilters('filter.v.availability=1&filter.v.price.gte=0&filter.v.price.lte=2629.95')">Test</button>
+<body class="">
+  <div class="">
+    <div class="relative">
+      <a 
+        href="#" 
+        class="absolute top-8 left-[-4em] text-white text-center font-bold text-[16px] tracking-[0.06em] bg-red-700 py-2 px-20 shadow-[0_0_0.75em_rgba(0,0,0,0.5)] transform rotate-[-45deg] scale-y-[1] scale-x-[0.75] z-10"
+      >
+        Sold out
+        <span 
+          class="absolute inset-0 m-[-0.3em_-5em] border-2 border-dashed border-white/70 scale-[0.7]"
+        ></span>
+      </a>
+    </div>
+  </div>
 </body>
 </html>
